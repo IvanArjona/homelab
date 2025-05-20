@@ -1,0 +1,15 @@
+x-base:
+  &base
+  restart: unless-stopped
+  env_file:
+    - .env
+
+services:
+  changedetection:
+    <<: *base
+    container_name: changedetection
+    image: ghcr.io/dgtlmoon/changedetection.io
+    volumes:
+      - ./changedetection:/config
+    ports:
+      - 5000:5000
