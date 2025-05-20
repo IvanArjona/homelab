@@ -5,6 +5,18 @@ x-base:
     - .env
 
 services:
+  homepage:
+    <<: *base
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    ports:
+      - 3000:3000
+    volumes:
+      - ./homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: homeserver.local:3000
+
   changedetection:
     <<: *base
     container_name: changedetection

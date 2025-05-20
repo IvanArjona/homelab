@@ -2,21 +2,26 @@
 
 ## Setup
 
-### 1. Clone the repository
+### Clone the repository
 
 ```bash
 git clone https://github.com/IvanArjona/homeserver.git
 ```
 
-### 2. Run the setup script
+### Copy the example environment file
 
 ```bash
-cd homeserver
-chmod +x setup.sh
+cp .env.example .env
+```
+
+### Run the setup script
+
+```bash
+sudo chmod +x setup.sh
 ./setup.sh
 ```
 
-### 3. Run docker compose
+### Run docker compose
 
 ```bash
 docker-compose up -d
