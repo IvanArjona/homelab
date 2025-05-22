@@ -23,3 +23,7 @@ newgrp docker
 # Configure Docker to start on boot with systemd
 sudo systemctl enable docker.service
 sudo systemctl enable containerd.service
+
+# Disable systemd-resolved to free up port 53 for pihole
+sudo systemctl disable systemd-resolved
+sudo systemctl stop systemd-resolved
