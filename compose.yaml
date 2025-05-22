@@ -9,8 +9,8 @@ services:
     image: ghcr.io/tecnativa/docker-socket-proxy:latest
     container_name: dockerproxy
     environment:
-      - CONTAINERS=1 # Allow access to viewing containers
-      - POST=0 # Disallow any POST operations (effectively read-only)
+      CONTAINERS: 1 # Allow access to viewing containers
+      POST: 0 # Disallow any POST operations (effectively read-only)
     ports:
       - 127.0.0.1:2375:2375
     volumes:
@@ -30,6 +30,23 @@ services:
       - traefik.http.routers.homepage.rule=Host(`${DOMAIN}`)
       - traefik.http.routers.homepage.entrypoints=web
       - traefik.http.services.homepage.loadbalancer.server.port=3000
+
+  wireguard:
+    <<: *base
+    image: ghcr.io/linuxserver/wireguard:latest
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      PEERS: 1
+    ports:
+      - 51820:51820/udp
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    volumes:
+      - ./wireguard:/config
+      - /lib/modules:/lib/modules
 
   traefik:
     <<: *base
