@@ -9,28 +9,50 @@ services:
     <<: *base
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
-    ports:
-      - 80:3000
     volumes:
       - ./homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      HOMEPAGE_ALLOWED_HOSTS: homeserver.local
+      HOMEPAGE_ALLOWED_HOSTS: homelab.local
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.homepage.rule=Host(`homelab.local`)
+      - traefik.http.routers.homepage.entrypoints=web
+      - traefik.http.services.homepage.loadbalancer.server.port=3000
+
+  traefik:
+    <<: *base
+    image: traefik:v3.4
+    container_name: traefik
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entryPoints.web.address=:80
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./letsencrypt:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
 
   pihole:
     <<: *base
     container_name: pihole
     image: pihole/pihole:latest
     ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "1001:80/tcp"
+      - 53:53/tcp
+      - 53:53/udp
     environment:
       FTLCONF_dns_listeningMode: all
       FTLCONF_dns_upstreams: 1.1.1.1;1.0.0.1;2606:4700:4700::1111;2606:4700:4700::1001
       FTLCONF_dns_dnssec: true
     volumes:
       - ./pihole:/etc/pihole
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pihole.rule=Host(`pihole.homelab.local`)
+      - traefik.http.routers.pihole.entrypoints=web
+      - traefik.http.services.pihole.loadbalancer.server.port=80
 
   changedetection:
     <<: *base
@@ -38,5 +60,8 @@ services:
     image: ghcr.io/dgtlmoon/changedetection.io
     volumes:
       - ./changedetection:/config
-    ports:
-      - 5000:5000
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.changedetection.rule=Host(`changedetection.homelab.local`)
+      - traefik.http.routers.changedetection.entrypoints=web
+      - traefik.http.services.changedetection.loadbalancer.server.port=5000
