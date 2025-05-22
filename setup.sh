@@ -27,3 +27,10 @@ sudo systemctl enable containerd.service
 # Disable systemd-resolved to free up port 53 for pihole
 sudo systemctl disable systemd-resolved
 sudo systemctl stop systemd-resolved
+
+# Create data directory
+sudo mkdir -p /data
+sudo chown $USER:$GROUPS /data
+mkdir -p /data/downloads/complete
+mkdir -p /data/downloads/incomplete
+mkdir -p /data/watch

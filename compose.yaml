@@ -92,15 +92,39 @@ services:
       - homepage.widget.key=${PIHOLE_PASSWORD}
       - homepage.widget.version=6
 
+  transmission:
+    <<: *base
+    container_name: transmission
+    image: ghcr.io/linuxserver/transmission:latest
+    ports:
+      - 51413:51413
+      - 51413:51413/udp
+    volumes:
+      - ./transmission:/data
+      - /data/downloads:/downloads
+      - /data/watch:/watch
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.transmission.rule=Host(`transmission.${DOMAIN}`)
+      - traefik.http.routers.transmission.entrypoints=web
+      - traefik.http.services.transmission.loadbalancer.server.port=9091
+      - homepage.group=Download
+      - homepage.name=Transmission
+      - homepage.icon=transmission.png
+      - homepage.href=http://transmission.${DOMAIN}
+      - homepage.description=BitTorrent client
+      - homepage.widget.type=transmission
+      - homepage.widget.url=http://transmission:9091
+
   changedetection:
     <<: *base
     container_name: changedetection
     image: ghcr.io/dgtlmoon/changedetection.io
-    volumes:
-      - ./changedetection:/config
     environment:
       BASE_URL: http://changedetection.${DOMAIN}
       DISABLE_VERSION_CHECK: true
+    volumes:
+      - ./changedetection:/config
     labels:
       - traefik.enable=true
       - traefik.http.routers.changedetection.rule=Host(`changedetection.${DOMAIN}`)
