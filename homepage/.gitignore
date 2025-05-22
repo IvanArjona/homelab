@@ -1,1 +1,6 @@
+*
 !.gitignore
+!bookmarks.yaml
+!docker.yaml
+!services.yaml
+!widgets.yaml
