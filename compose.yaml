@@ -13,10 +13,10 @@ services:
       - ./homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      HOMEPAGE_ALLOWED_HOSTS: homelab.local
+      HOMEPAGE_ALLOWED_HOSTS: ${DOMAIN}
     labels:
       - traefik.enable=true
-      - traefik.http.routers.homepage.rule=Host(`homelab.local`)
+      - traefik.http.routers.homepage.rule=Host(`${DOMAIN}`)
       - traefik.http.routers.homepage.entrypoints=web
       - traefik.http.services.homepage.loadbalancer.server.port=3000
 
@@ -50,7 +50,7 @@ services:
       - ./pihole:/etc/pihole
     labels:
       - traefik.enable=true
-      - traefik.http.routers.pihole.rule=Host(`pihole.homelab.local`)
+      - traefik.http.routers.pihole.rule=Host(`pihole.${DOMAIN}`)
       - traefik.http.routers.pihole.entrypoints=web
       - traefik.http.services.pihole.loadbalancer.server.port=80
 
@@ -62,6 +62,6 @@ services:
       - ./changedetection:/config
     labels:
       - traefik.enable=true
-      - traefik.http.routers.changedetection.rule=Host(`changedetection.homelab.local`)
+      - traefik.http.routers.changedetection.rule=Host(`changedetection.${DOMAIN}`)
       - traefik.http.routers.changedetection.entrypoints=web
       - traefik.http.services.changedetection.loadbalancer.server.port=5000
