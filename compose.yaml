@@ -204,3 +204,21 @@ services:
       - homepage.widget.type=changedetectionio
       - homepage.widget.url=http://changedetection:5000
       - homepage.widget.key=${CHANGEDETECTION_API_KEY}
+
+  samba:
+    <<: *base
+    container_name: samba
+    image: dperson/samba:latest
+    ports:
+      - 137:137/udp
+      - 138:138/udp
+      - 139:139/tcp
+      - 445:445/tcp
+    environment:
+      USERID: ${PUID}
+      GROUPID: ${GUID}
+    volumes:
+      - /data:/data:z
+    tmpfs:
+      - /tmp
+    command: '-s "data;/data;;no" -u "${SAMBA_USER};${SAMBA_PASSWORD}" -p -n -r'
