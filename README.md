@@ -1,11 +1,11 @@
-# HomeServer
+# HomeLab
 
 ## Setup
 
 ### Clone the repository
 
 ```bash
-git clone https://github.com/IvanArjona/homeserver.git
+git clone https://github.com/IvanArjona/homelab.git
 ```
 
 ### Copy the example environment file
