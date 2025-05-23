@@ -182,6 +182,29 @@ services:
       - homepage.widget.type=transmission
       - homepage.widget.url=http://transmission:9091
 
+  homeassistant:
+    <<: *base
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    privileged: true
+    volumes:
+      - ./homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.homeassistant.rule=Host(`homeassistant.${DOMAIN}`)
+      - traefik.http.routers.homeassistant.entrypoints=web
+      - traefik.http.services.homeassistant.loadbalancer.server.port=8123
+      - homepage.group=Home
+      - homepage.name=Home Assistant
+      - homepage.icon=home-assistant.png
+      - homepage.href=http://homeassistant.${DOMAIN}
+      - homepage.description=Home automation platform
+      - homepage.widget.type=homeassistant
+      - homepage.widget.url=http://homeassistant:8123
+      - homepage.widget.key=${HOMEASSISTANT_API_KEY}
+
   changedetection:
     <<: *base
     container_name: changedetection
