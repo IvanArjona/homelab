@@ -113,6 +113,28 @@ services:
       - homepage.widget.url=http://jellyfin:8096
       - homepage.widget.key=${JELLYFIN_API_KEY}
 
+  sonarr:
+    <<: *base
+    container_name: sonarr
+    image: ghcr.io/linuxserver/sonarr:latest
+    volumes:
+      - ./sonarr:/config
+      - /data/media/shows:/media/shows
+      - /data/downloads:/downloads
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.sonarr.rule=Host(`sonarr.${DOMAIN}`)
+      - traefik.http.routers.sonarr.entrypoints=web
+      - traefik.http.services.sonarr.loadbalancer.server.port=8989
+      - homepage.group=Download
+      - homepage.name=Sonarr
+      - homepage.icon=sonarr.png
+      - homepage.href=http://sonarr.${DOMAIN}
+      - homepage.description=TV series manager
+      - homepage.widget.type=sonarr
+      - homepage.widget.url=http://sonarr:8989
+      - homepage.widget.key=${SONARR_API_KEY}
+
   transmission:
     <<: *base
     container_name: transmission
