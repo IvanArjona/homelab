@@ -31,6 +31,8 @@ sudo systemctl stop systemd-resolved
 # Create data directory
 sudo mkdir -p /data
 sudo chown $USER:$GROUPS /data
+mkdir -p /data/media/shows
+mkdir -p /data/media/movies
 mkdir -p /data/downloads/complete
 mkdir -p /data/downloads/incomplete
 mkdir -p /data/watch
