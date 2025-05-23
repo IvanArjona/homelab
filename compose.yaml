@@ -135,6 +135,29 @@ services:
       - homepage.widget.url=http://sonarr:8989
       - homepage.widget.key=${SONARR_API_KEY}
 
+  radarr:
+    <<: *base
+    container_name: radarr
+    image: ghcr.io/linuxserver/radarr:latest
+    volumes:
+      - ./radarr:/config
+      - /data/media/movies:/media/movies
+      - /data/downloads:/downloads
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.radarr.rule=Host(`radarr.${DOMAIN}`)
+      - traefik.http.routers.radarr.entrypoints=web
+      - traefik.http.services.radarr.loadbalancer.server.port=7878
+      - homepage.group=Download
+      - homepage.name=Radarr
+      - homepage.icon=radarr.png
+      - homepage.href=http://radarr.${DOMAIN}
+      - homepage.description=Movie manager
+      - homepage.widget.type=radarr
+      - homepage.widget.url=http://radarr:7878
+      - homepage.widget.key=${RADARR_API_KEY}
+      
+
   transmission:
     <<: *base
     container_name: transmission
@@ -178,3 +201,6 @@ services:
       - homepage.icon=changedetection.png
       - homepage.href=http://changedetection.${DOMAIN}
       - homepage.description=Website change detection
+      - homepage.widget.type=changedetectionio
+      - homepage.widget.url=http://changedetection:5000
+      - homepage.widget.key=${CHANGEDETECTION_API_KEY}
