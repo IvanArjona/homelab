@@ -56,8 +56,11 @@ services:
       FTLCONF_webserver_api_password: ${PIHOLE_PASSWORD}
       FTLCONF_dns_listeningMode: all
       FTLCONF_dns_upstreams: 1.1.1.1;1.0.0.1
+      FTLCONF_misc_etc_dnsmasq_d: true
+      FTLCONF_misc_dnsmasq_lines: address=/${DOMAIN}/${SERVER_IP}
     volumes:
       - ./pihole:/etc/pihole
+      - ./pihole/dnsmasq.d:/etc/dnsmasq.d
     networks:
       default:
         ipv4_address: ${PIHOLE_IP}
