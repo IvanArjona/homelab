@@ -56,7 +56,6 @@ services:
       FTLCONF_webserver_api_password: ${PIHOLE_PASSWORD}
       FTLCONF_dns_listeningMode: all
       FTLCONF_dns_upstreams: 1.1.1.1;1.0.0.1
-      FTLCONF_dns_dnssec: true
     volumes:
       - ./pihole:/etc/pihole
     networks:
