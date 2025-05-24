@@ -179,7 +179,28 @@ services:
       - homepage.widget.type=radarr
       - homepage.widget.url=http://radarr:7878
       - homepage.widget.key=${RADARR_API_KEY}
-      
+
+  prowlarr:
+    <<: *base
+    container_name: prowlarr
+    image: ghcr.io/linuxserver/prowlarr:latest
+    volumes:
+      - ./prowlarr:/config
+      - /data/downloads:/downloads
+      - /data/watch:/watch
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.prowlarr.rule=Host(`prowlarr.${DOMAIN}`)
+      - traefik.http.routers.prowlarr.entrypoints=web
+      - traefik.http.services.prowlarr.loadbalancer.server.port=9696
+      - homepage.group=Download
+      - homepage.name=Prowlarr
+      - homepage.icon=prowlarr.png
+      - homepage.href=http://prowlarr.${DOMAIN}
+      - homepage.description=Indexer manager
+      - homepage.widget.type=prowlarr
+      - homepage.widget.url=http://prowlarr:9696
+      - homepage.widget.key=${PROWLARR_API_KEY}
 
   transmission:
     <<: *base
