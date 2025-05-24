@@ -27,6 +27,7 @@ sudo systemctl enable containerd.service
 # Disable systemd-resolved to free up port 53 for pihole
 sudo systemctl disable systemd-resolved
 sudo systemctl stop systemd-resolved
+sudo sed -i 's/^nameserver [0-9]\{1,3\}\(\.[0-9]\{1,3\}\)\{3\}$/nameserver 8.8.8.8/' /etc/resolv.conf
 
 # Create data directory
 sudo mkdir -p /data
