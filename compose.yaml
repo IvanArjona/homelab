@@ -6,9 +6,12 @@ x-env: &env
 x-base: &base
   restart: unless-stopped
   environment: *env
+  networks:
+    homelab:
 
 services:
   dockerproxy:
+    <<: *base
     image: ghcr.io/tecnativa/docker-socket-proxy:latest
     container_name: dockerproxy
     environment:
@@ -68,7 +71,7 @@ services:
       - ./pihole:/etc/pihole
       - ./pihole/dnsmasq.d:/etc/dnsmasq.d
     networks:
-      default:
+      homelab:
         ipv4_address: ${PIHOLE_IP}
     labels:
       - traefik.enable=true
@@ -321,7 +324,7 @@ services:
     command: '-s "data;/data;;no" -u "${SAMBA_USER};${SAMBA_PASSWORD}" -p -n -r'
 
 networks:
-  default:
+  homelab:
     ipam:
       config:
         - subnet: ${NETWORK_SUBNET}
