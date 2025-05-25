@@ -1,14 +1,18 @@
-x-base:
-  &base
+x-env: &env
+  PUID: ${PUID}
+  GUID: ${GUID}
+  TZ: ${TZ}
+
+x-base: &base
   restart: unless-stopped
-  env_file:
-    - .env
+  environment: *env
 
 services:
   dockerproxy:
     image: ghcr.io/tecnativa/docker-socket-proxy:latest
     container_name: dockerproxy
     environment:
+      <<: *env
       CONTAINERS: 1 # Allow access to viewing containers
       POST: 0 # Disallow any POST operations (effectively read-only)
     ports:
@@ -54,6 +58,7 @@ services:
       - 53:53/tcp
       - 53:53/udp
     environment:
+      <<: *env
       FTLCONF_webserver_api_password: ${PIHOLE_PASSWORD}
       FTLCONF_dns_listeningMode: all
       FTLCONF_dns_upstreams: 1.1.1.1;1.0.0.1
@@ -85,6 +90,7 @@ services:
     image: ghcr.io/wg-easy/wg-easy:14
     container_name: wireguard
     environment:
+      <<: *env
       WG_HOST: ${PUBLIC_DOMAIN}
       WG_DEFAULT_DNS: ${PIHOLE_IP}
       PASSWORD_HASH: ${WIREGUARD_PASSWORD_HASH}
@@ -149,8 +155,8 @@ services:
       - traefik.http.routers.sonarr.rule=Host(`sonarr.${DOMAIN}`)
       - traefik.http.routers.sonarr.entrypoints=web
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
-      - homepage.group=Download
-      - homepage.name=Media
+      - homepage.group=Media
+      - homepage.name=Sonarr
       - homepage.icon=sonarr.png
       - homepage.href=http://sonarr.${DOMAIN}
       - homepage.description=TV series manager
@@ -171,8 +177,8 @@ services:
       - traefik.http.routers.radarr.rule=Host(`radarr.${DOMAIN}`)
       - traefik.http.routers.radarr.entrypoints=web
       - traefik.http.services.radarr.loadbalancer.server.port=7878
-      - homepage.group=Download
-      - homepage.name=Media
+      - homepage.group=Media
+      - homepage.name=Radarr
       - homepage.icon=radarr.png
       - homepage.href=http://radarr.${DOMAIN}
       - homepage.description=Movie manager
@@ -276,6 +282,7 @@ services:
     container_name: changedetection
     image: ghcr.io/dgtlmoon/changedetection.io
     environment:
+      <<: *env
       BASE_URL: http://changedetection.${DOMAIN}
       DISABLE_VERSION_CHECK: true
     volumes:
@@ -304,6 +311,7 @@ services:
       - 139:139/tcp
       - 445:445/tcp
     environment:
+      <<: *env
       USERID: ${PUID}
       GROUPID: ${GUID}
     volumes:
