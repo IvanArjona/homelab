@@ -18,7 +18,6 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin d
 # Add the current user to the docker group
 sudo groupadd -f docker
 sudo usermod -aG docker $USER
-newgrp docker
 
 # Configure Docker to start on boot with systemd
 sudo systemctl enable docker.service
@@ -30,8 +29,9 @@ sudo systemctl stop systemd-resolved
 sudo sed -i 's/^nameserver [0-9]\{1,3\}\(\.[0-9]\{1,3\}\)\{3\}$/nameserver 8.8.8.8/' /etc/resolv.conf
 
 # Create data directory
+source .env
 sudo mkdir -p /data
-sudo chown $USER:$GROUPS /data
+sudo chown $PUID:$GUID /data
 mkdir -p /data/media/shows
 mkdir -p /data/media/movies
 mkdir -p /data/downloads/complete
