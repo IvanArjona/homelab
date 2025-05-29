@@ -233,6 +233,23 @@ services:
       - homepage.widget.url=http://prowlarr:9696
       - homepage.widget.key=${PROWLARR_API_KEY}
 
+  flaresolverr:
+    <<: *base
+    container_name: flaresolverr
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.flaresolverr.rule=Host(`flaresolverr.${DOMAIN}`)
+      - traefik.http.routers.flaresolverr.entrypoints=web
+      - traefik.http.services.flaresolverr.loadbalancer.server.port=8191
+      - homepage.group=Download
+      - homepage.name=FlareSolverr
+      - homepage.icon=flaresolverr.png
+      - homepage.href=http://flaresolverr.${DOMAIN}
+      - homepage.description=Bypass Cloudflare protection
+      - homepage.widget.type=flaresolverr
+      - homepage.widget.url=http://flaresolverr:8191
+
   transmission:
     <<: *base
     container_name: transmission
