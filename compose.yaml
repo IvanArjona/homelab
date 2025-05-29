@@ -256,7 +256,7 @@ services:
       - 51413:51413
       - 51413:51413/udp
     volumes:
-      - ./transmission:/data
+      - ./transmission:/config
       - /data/downloads:/downloads
       - /data/watch:/watch
       - /data/media:/media
