@@ -233,6 +233,28 @@ services:
       - homepage.widget.url=http://prowlarr:9696
       - homepage.widget.key=${PROWLARR_API_KEY}
 
+  jackett:
+    <<: *base
+    container_name: jackett
+    image: ghcr.io/linuxserver/jackett:latest
+    volumes:
+      - ./jackett:/config
+      - /data/downloads:/downloads
+      - /data/watch:/watch
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jackett.rule=Host(`jackett.${DOMAIN}`)
+      - traefik.http.routers.jackett.entrypoints=web
+      - traefik.http.services.jackett.loadbalancer.server.port=9117
+      - homepage.group=Download
+      - homepage.name=Jackett
+      - homepage.icon=jackett.png
+      - homepage.href=http://jackett.${DOMAIN}
+      - homepage.description=Torrent indexer aggregator
+      - homepage.widget.type=jackett
+      - homepage.widget.url=http://jackett:9117
+      - homepage.widget.password=${JACKETT_API_KEY}
+
   flaresolverr:
     <<: *base
     container_name: flaresolverr
