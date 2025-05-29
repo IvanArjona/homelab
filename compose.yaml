@@ -247,8 +247,6 @@ services:
       - homepage.icon=flaresolverr.png
       - homepage.href=http://flaresolverr.${DOMAIN}
       - homepage.description=Bypass Cloudflare protection
-      - homepage.widget.type=flaresolverr
-      - homepage.widget.url=http://flaresolverr:8191
 
   transmission:
     <<: *base
@@ -261,6 +259,7 @@ services:
       - ./transmission:/data
       - /data/downloads:/downloads
       - /data/watch:/watch
+      - /data/media:/media
     labels:
       - traefik.enable=true
       - traefik.http.routers.transmission.rule=Host(`transmission.${DOMAIN}`)
