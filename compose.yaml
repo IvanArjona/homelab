@@ -229,7 +229,7 @@ services:
       - homepage.description=Torrent indexer aggregator
       - homepage.widget.type=jackett
       - homepage.widget.url=http://jackett:9117
-      - homepage.widget.password=${JACKETT_API_KEY}
+      - homepage.widget.password=${JACKETT_PASSWORD}
 
   flaresolverr:
     <<: *base
