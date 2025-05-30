@@ -251,6 +251,9 @@ services:
     container_name: byparr
     image: ghcr.io/thephaseless/byparr:latest
     shm_size: 2gb
+    environment:
+      <<: *env
+      PROXY: 127.0.0.1:2375
     labels:
       - traefik.enable=true
       - traefik.http.routers.byparr.rule=Host(`byparr.${DOMAIN}`)
