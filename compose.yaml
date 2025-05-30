@@ -210,27 +210,6 @@ services:
       - homepage.widget.url=http://bazarr:6767
       - homepage.widget.key=${BAZARR_API_KEY}
 
-  prowlarr:
-    <<: *base
-    container_name: prowlarr
-    image: ghcr.io/linuxserver/prowlarr:latest
-    volumes:
-      - ./prowlarr:/config
-      - /data/torrents:/data/torrents
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.prowlarr.rule=Host(`prowlarr.${DOMAIN}`)
-      - traefik.http.routers.prowlarr.entrypoints=web
-      - traefik.http.services.prowlarr.loadbalancer.server.port=9696
-      - homepage.group=Download
-      - homepage.name=Prowlarr
-      - homepage.icon=prowlarr.png
-      - homepage.href=http://prowlarr.${DOMAIN}
-      - homepage.description=Indexer manager
-      - homepage.widget.type=prowlarr
-      - homepage.widget.url=http://prowlarr:9696
-      - homepage.widget.key=${PROWLARR_API_KEY}
-
   jackett:
     <<: *base
     container_name: jackett
@@ -265,6 +244,22 @@ services:
       - homepage.name=FlareSolverr
       - homepage.icon=flaresolverr.png
       - homepage.href=http://flaresolverr.${DOMAIN}
+      - homepage.description=Bypass Cloudflare protection
+
+  byparr:
+    <<: *base
+    container_name: byparr
+    image: ghcr.io/thephaseless/byparr:latest
+    shm_size: 2gb
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.byparr.rule=Host(`byparr.${DOMAIN}`)
+      - traefik.http.routers.byparr.entrypoints=web
+      - traefik.http.services.byparr.loadbalancer.server.port=8191
+      - homepage.group=Download
+      - homepage.name=ByParr
+      - homepage.icon=flaresolverr.png
+      - homepage.href=http://byparr.${DOMAIN}
       - homepage.description=Bypass Cloudflare protection
 
   qbittorrent:
