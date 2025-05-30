@@ -23,10 +23,9 @@ sudo usermod -aG docker $USER
 sudo systemctl enable docker.service
 sudo systemctl enable containerd.service
 
-# Disable systemd-resolved to free up port 53 for pihole
-sudo systemctl disable systemd-resolved
-sudo systemctl stop systemd-resolved
-sudo sed -i 's/^nameserver [0-9]\{1,3\}\(\.[0-9]\{1,3\}\)\{3\}$/nameserver 8.8.8.8/' /etc/resolv.conf
+# Free up port 53 for pihole
+sudo sed -i 's/^\#DNSStubListener=yes$/DNSStubListener=no/' /etc/systemd/resolved.conf
+sudo systemctl restart systemd-resolved
 
 # Create data directory
 source .env
