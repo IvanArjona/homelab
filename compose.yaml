@@ -130,7 +130,7 @@ services:
     image: jellyfin/jellyfin:latest
     volumes:
       - ./jellyfin:/config
-      - /data/media:/media
+      - /data/media:/data/media
     labels:
       - traefik.enable=true
       - traefik.http.routers.jellyfin.rule=Host(`jellyfin.${DOMAIN}`)
@@ -151,8 +151,8 @@ services:
     image: ghcr.io/linuxserver/sonarr:latest
     volumes:
       - ./sonarr:/config
-      - /data/media/shows:/media/shows
-      - /data/downloads:/downloads
+      - /data/media/tv:/data/media/tv
+      - /data/torrents/:/data/torrents
     labels:
       - traefik.enable=true
       - traefik.http.routers.sonarr.rule=Host(`sonarr.${DOMAIN}`)
@@ -173,8 +173,8 @@ services:
     image: ghcr.io/linuxserver/radarr:latest
     volumes:
       - ./radarr:/config
-      - /data/media/movies:/media/movies
-      - /data/downloads:/downloads
+      - /data/media/movies:/data/media/movies
+      - /data/torrents:/data/torrents
     labels:
       - traefik.enable=true
       - traefik.http.routers.radarr.rule=Host(`radarr.${DOMAIN}`)
@@ -195,8 +195,7 @@ services:
     image: ghcr.io/linuxserver/bazarr:latest
     volumes:
       - ./bazarr:/config
-      - /data/media/shows:/media/shows
-      - /data/media/movies:/media/movies
+      - /data/media:/data/media
     labels:
       - traefik.enable=true
       - traefik.http.routers.bazarr.rule=Host(`bazarr.${DOMAIN}`)
@@ -217,8 +216,7 @@ services:
     image: ghcr.io/linuxserver/prowlarr:latest
     volumes:
       - ./prowlarr:/config
-      - /data/downloads:/downloads
-      - /data/watch:/watch
+      - /data/torrents:/data/torrents
     labels:
       - traefik.enable=true
       - traefik.http.routers.prowlarr.rule=Host(`prowlarr.${DOMAIN}`)
@@ -239,8 +237,7 @@ services:
     image: ghcr.io/linuxserver/jackett:latest
     volumes:
       - ./jackett:/config
-      - /data/downloads:/downloads
-      - /data/watch:/watch
+      - /data/torrents:/data/torrents
     labels:
       - traefik.enable=true
       - traefik.http.routers.jackett.rule=Host(`jackett.${DOMAIN}`)
@@ -279,9 +276,8 @@ services:
       - 51413:51413/udp
     volumes:
       - ./transmission:/config
-      - /data/downloads:/downloads
-      - /data/watch:/watch
-      - /data/media:/media
+      - /data/torrents:/data/torrents
+      - /data/media:/data/media
     labels:
       - traefik.enable=true
       - traefik.http.routers.transmission.rule=Host(`transmission.${DOMAIN}`)

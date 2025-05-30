@@ -32,8 +32,7 @@ sudo sed -i 's/^nameserver [0-9]\{1,3\}\(\.[0-9]\{1,3\}\)\{3\}$/nameserver 8.8.8
 source .env
 sudo mkdir -p /data
 sudo chown $PUID:$GUID /data
-mkdir -p /data/media/shows
+mkdir -p /data/torrents/movies
+mkdir -p /data/torrents/tv
 mkdir -p /data/media/movies
-mkdir -p /data/downloads/complete
-mkdir -p /data/downloads/incomplete
-mkdir -p /data/watch
+mkdir -p /data/media/tv
