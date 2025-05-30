@@ -267,29 +267,31 @@ services:
       - homepage.href=http://flaresolverr.${DOMAIN}
       - homepage.description=Bypass Cloudflare protection
 
-  transmission:
+  qbittorrent:
     <<: *base
-    container_name: transmission
-    image: ghcr.io/linuxserver/transmission:latest
+    container_name: qbittorrent
+    image: ghcr.io/linuxserver/qbittorrent:latest
     ports:
-      - 51413:51413
-      - 51413:51413/udp
+      - 6881:6881/tcp
+      - 6881:6881/udp
     volumes:
-      - ./transmission:/config
+      - ./qbittorrent:/config
       - /data/torrents:/data/torrents
       - /data/media:/data/media
     labels:
       - traefik.enable=true
-      - traefik.http.routers.transmission.rule=Host(`transmission.${DOMAIN}`)
-      - traefik.http.routers.transmission.entrypoints=web
-      - traefik.http.services.transmission.loadbalancer.server.port=9091
+      - traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${DOMAIN}`)
+      - traefik.http.routers.qbittorrent.entrypoints=web
+      - traefik.http.services.qbittorrent.loadbalancer.server.port=8080
       - homepage.group=Download
-      - homepage.name=Transmission
-      - homepage.icon=transmission.png
-      - homepage.href=http://transmission.${DOMAIN}
+      - homepage.name=qBittorrent
+      - homepage.icon=qbittorrent.png
+      - homepage.href=http://qbittorrent.${DOMAIN}
       - homepage.description=BitTorrent client
-      - homepage.widget.type=transmission
-      - homepage.widget.url=http://transmission:9091
+      - homepage.widget.type=qbittorrent
+      - homepage.widget.url=http://qbittorrent:8080
+      - homepage.widget.username=${QBITTORRENT_USERNAME}
+      - homepage.widget.password=${QBITTORRENT_PASSWORD}
 
   homeassistant:
     <<: *base
