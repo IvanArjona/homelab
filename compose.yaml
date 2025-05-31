@@ -314,6 +314,23 @@ services:
       - homepage.widget.url=http://homeassistant:8123
       - homepage.widget.key=${HOMEASSISTANT_API_KEY}
 
+  browserless:
+    <<: *base
+    container_name: browserless
+    image: ghcr.io/browserless/chromium
+    shm_size: 2gb
+    environment:
+      <<: *env
+      TOKEN: ${BROWSERLESS_CHROMIUM_TOKEN}
+      TIMEOUT: 60000
+      CORS: true
+      CONCURRENT: 10
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.browserless.rule=Host(`browserless.${DOMAIN}`)
+      - traefik.http.routers.browserless.entrypoints=web
+      - traefik.http.services.browserless.loadbalancer.server.port=3000
+
   changedetection:
     <<: *base
     container_name: changedetection
@@ -322,9 +339,13 @@ services:
       <<: *env
       BASE_URL: http://changedetection.${DOMAIN}
       DISABLE_VERSION_CHECK: true
+      PLAYWRIGHT_DRIVER_URL: ${PLAYWRIGHT_DRIVER_URL}
     volumes:
       - ./changedetection/config:/config
       - ./changedetection/datastore:/datastore
+    depends_on:
+      browserless:
+        condition: service_started
     labels:
       - traefik.enable=true
       - traefik.http.routers.changedetection.rule=Host(`changedetection.${DOMAIN}`)
