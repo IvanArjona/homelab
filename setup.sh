@@ -27,6 +27,12 @@ sudo systemctl enable containerd.service
 sudo sed -i 's/^\#DNSStubListener=yes$/DNSStubListener=no/' /etc/systemd/resolved.conf
 sudo systemctl restart systemd-resolved
 
+# Install iptables and ip6tables for wireguard
+sudo modprobe iptable_nat
+echo "iptable_nat" | sudo tee -a /etc/modules
+sudo modprobe ip6table_nat
+echo "ip6table_nat" | sudo tee -a /etc/modules
+
 # Create data directory
 source .env
 sudo mkdir -p /data
