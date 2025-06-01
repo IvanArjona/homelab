@@ -39,6 +39,17 @@ services:
       - ./letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
+  cloudflareddns:
+    <<: *base
+    image: oznu/cloudflare-ddns:latest
+    container_name: cloudflareddns
+    environment:
+      <<: *env
+      API_KEY: ${CLOUDFLARE_API_TOKEN}
+      ZONE: ${CLOUDFLARE_ZONE}
+      SUBDOMAIN: ${CLOUDFLARE_SUBDOMAIN}
+      PROXIED: false
+
   homepage:
     <<: *base
     image: ghcr.io/gethomepage/homepage:latest
