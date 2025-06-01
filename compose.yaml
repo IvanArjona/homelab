@@ -123,7 +123,7 @@ services:
 
   wireguard:
     <<: *base
-    image: ghcr.io/wg-easy/wg-easy:14
+    image: ghcr.io/wg-easy/wg-easy:15
     container_name: wireguard
     environment:
       <<: *env
