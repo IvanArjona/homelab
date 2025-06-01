@@ -430,6 +430,58 @@ services:
       - /tmp
     command: '-s "data;/data;;no" -u "${SAMBA_USER};${SAMBA_PASSWORD}" -p -n -r'
 
+  chrome:
+    <<: *base
+    image: gcr.io/zenika-hub/alpine-chrome:123
+    command:
+      - --no-sandbox
+      - --disable-gpu
+      - --disable-dev-shm-usage
+      - --remote-debugging-address=0.0.0.0
+      - --remote-debugging-port=9222
+      - --hide-scrollbars
+
+  meilisearch:
+    <<: *base
+    container_name: meilisearch
+    image: getmeili/meilisearch:v1.13.3
+    environment:
+      <<: *env
+      MEILI_NO_ANALYTICS: true
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+    volumes:
+      - ./meilisearch:/meili_data
+
+  karakeep:
+    <<: *base
+    container_name: karakeep
+    image: ghcr.io/karakeep-app/karakeep:release
+    environment:
+      <<: *env
+      KARAKEEP_API_KEY: ${KARAKEEP_API_KEY}
+      MEILI_ADDR: http://meilisearch:7700
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+      BROWSER_WEB_URL: http://chrome:9222
+      DATA_DIR: /data
+      NEXTAUTH_URL: https://karakeep.${DOMAIN}
+      NEXTAUTH_SECRET: ${KARAKEEP_NEXTAUTH_SECRET}
+    volumes:
+      - ./karakeep:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.karakeep.rule=Host(`karakeep.${DOMAIN}`)
+      - traefik.http.routers.karakeep.entrypoints=web,websecure
+      - traefik.http.routers.karakeep.tls.certresolver=resolver
+      - traefik.http.services.karakeep.loadbalancer.server.port=3000
+      - homepage.group=Automation
+      - homepage.name=KaraKeep
+      - homepage.icon=karakeep.png
+      - homepage.href=https://karakeep.${DOMAIN}
+      - homepage.description=Bookmarks manager
+      - homepage.widget.type=karakeep
+      - homepage.widget.url=http://karakeep:3000
+      - homepage.widget.key=${KARAKEEP_API_KEY}
+
 networks:
   homelab:
     ipam:
