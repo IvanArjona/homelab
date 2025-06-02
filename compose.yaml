@@ -11,6 +11,20 @@ x-base: &base
     homelab:
 
 services:
+  dockerproxy:
+    <<: *base
+    image: ghcr.io/tecnativa/docker-socket-proxy:latest
+    container_name: dockerproxy
+    user: root
+    environment:
+      <<: *env
+      CONTAINERS: 1 # Allow access to viewing containers
+      POST: 0 # Disallow any POST operations (effectively read-only)
+    ports:
+      - 127.0.0.1:2375:2375
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
   traefik:
     <<: *base
     image: traefik:v3.4
@@ -19,6 +33,7 @@ services:
       - --api.insecure=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
+      - --providers.docker.endpoint=tcp://dockerproxy:2375
       - --entryPoints.web.address=:80
       - --entryPoints.websecure.address=:443
       - --certificatesresolvers.resolver.acme.dnschallenge=true
@@ -33,7 +48,6 @@ services:
       - 443:443
     volumes:
       - ./traefik/letsencrypt:/letsencrypt
-      - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
@@ -78,7 +92,7 @@ services:
     <<: *base
     container_name: pihole
     image: pihole/pihole:latest
-    user: root:root
+    user: root
     ports:
       - 53:53/tcp
       - 53:53/udp
