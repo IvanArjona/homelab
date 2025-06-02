@@ -379,6 +379,7 @@ services:
     <<: *base
     container_name: browserless
     image: ghcr.io/browserless/chromium
+    user: root
     shm_size: 2gb
     environment:
       <<: *env
@@ -427,6 +428,7 @@ services:
     <<: *base
     container_name: samba
     image: dperson/samba:latest
+    user: root
     ports:
       - 137:137/udp
       - 138:138/udp
@@ -438,9 +440,10 @@ services:
       GROUPID: ${GUID}
     volumes:
       - /data:/data:z
+      - .:/home:z
     tmpfs:
       - /tmp
-    command: '-s "data;/data;;no" -u "${SAMBA_USER};${SAMBA_PASSWORD}" -p -n -r'
+    command: '-s "data;/data;;no" -s "home;/home;;no" -u "${SAMBA_USER};${SAMBA_PASSWORD}" -p -n -r'
 
   chrome:
     <<: *base
