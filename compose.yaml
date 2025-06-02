@@ -64,13 +64,15 @@ services:
 
   cloudflareddns:
     <<: *base
-    image: oznu/cloudflare-ddns:latest
+    image: favonia/cloudflare-ddns:latest
     container_name: cloudflareddns
+    read_only: true
+    cap_drop: [all]
+    security_opt: [no-new-privileges:true]
     environment:
       <<: *env
-      API_KEY: ${CLOUDFLARE_DNS_API_TOKEN}
-      ZONE: ${CLOUDFLARE_ZONE}
-      SUBDOMAIN: ${CLOUDFLARE_SUBDOMAIN}
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_DNS_API_TOKEN}
+      DOMAINS: ${PUBLIC_DOMAIN}
       PROXIED: false
 
   homepage:
