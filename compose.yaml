@@ -10,6 +10,12 @@ x-base: &base
   networks:
     homelab:
 
+x-volumes:
+  media: &media /data/media:/data/media
+  tv: &tv /data/media/tv:/data/media/tv
+  movies: &movies /data/media/movies:/data/media/movies
+  torrents: &torrents /data/torrents:/data/torrents
+
 services:
   dockerproxy:
     <<: *base
@@ -182,7 +188,7 @@ services:
     image: jellyfin/jellyfin:latest
     volumes:
       - ./jellyfin:/config
-      - /data/media:/data/media
+      - *media
     labels:
       - traefik.enable=true
       - traefik.http.routers.jellyfin.rule=Host(`jellyfin.${DOMAIN}`)
@@ -204,8 +210,8 @@ services:
     image: ghcr.io/linuxserver/sonarr:latest
     volumes:
       - ./sonarr:/config
-      - /data/media/tv:/data/media/tv
-      - /data/torrents/:/data/torrents
+      - *tv
+      - *torrents
     labels:
       - traefik.enable=true
       - traefik.http.routers.sonarr.rule=Host(`sonarr.${DOMAIN}`)
@@ -227,8 +233,8 @@ services:
     image: ghcr.io/linuxserver/radarr:latest
     volumes:
       - ./radarr:/config
-      - /data/media/movies:/data/media/movies
-      - /data/torrents:/data/torrents
+      - *movies
+      - *torrents
     labels:
       - traefik.enable=true
       - traefik.http.routers.radarr.rule=Host(`radarr.${DOMAIN}`)
@@ -250,7 +256,7 @@ services:
     image: ghcr.io/linuxserver/bazarr:latest
     volumes:
       - ./bazarr:/config
-      - /data/media:/data/media
+      - *media
     labels:
       - traefik.enable=true
       - traefik.http.routers.bazarr.rule=Host(`bazarr.${DOMAIN}`)
@@ -272,7 +278,7 @@ services:
     image: ghcr.io/linuxserver/jackett:latest
     volumes:
       - ./jackett:/config
-      - /data/torrents:/data/torrents
+      - *torrents
     labels:
       - traefik.enable=true
       - traefik.http.routers.jackett.rule=Host(`jackett.${DOMAIN}`)
@@ -333,8 +339,8 @@ services:
       - 6881:6881/udp
     volumes:
       - ./qbittorrent:/config
-      - /data/torrents:/data/torrents
-      - /data/media:/data/media
+      - *torrents
+      - *media
     labels:
       - traefik.enable=true
       - traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${DOMAIN}`)
