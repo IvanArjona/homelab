@@ -134,6 +134,7 @@ services:
     <<: *base
     image: ghcr.io/wg-easy/wg-easy:15
     container_name: wireguard
+    user: root
     environment:
       <<: *env
       INIT_ENABLED: true
