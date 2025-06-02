@@ -485,25 +485,6 @@ services:
       - homepage.widget.url=http://karakeep:3000
       - homepage.widget.key=${KARAKEEP_API_KEY}
 
-  obsidian-livesync:
-    <<: *base
-    container_name: obsidian-livesync
-    image: couchdb:latest
-    user: ${PUID}:${GUID}
-    environment:
-      <<: *env
-      COUCHDB_USER: ${OBSIDIAN_LIVESYNC_USER}
-      COUCHDB_PASSWORD: ${OBSIDIAN_LIVESYNC_PASSWORD}
-    volumes:
-      - ./obsidian-livesync:/opt/couchdb/data
-      - ./obsidian-livesync/local.ini:/opt/couchdb/etc/local.ini
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.obsidian-livesync.rule=Host(`obsidian-livesync.${DOMAIN}`)
-      - traefik.http.routers.obsidian-livesync.entrypoints=web,websecure
-      - traefik.http.routers.obsidian-livesync.tls.certresolver=resolver
-      - traefik.http.services.obsidian-livesync.loadbalancer.server.port=5984
-
 networks:
   homelab:
     ipam:
