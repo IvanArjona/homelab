@@ -161,7 +161,9 @@ services:
       - homepage.href=https://wireguard.${DOMAIN}
       - homepage.description=VPN server
       - homepage.widget.type=wgeasy
+      - homepage.widget.version=2
       - homepage.widget.url=http://wireguard:51821
+      - homepage.widget.username=${WIREGUARD_USER}
       - homepage.widget.password=${WIREGUARD_PASSWORD}
 
   jellyfin:
