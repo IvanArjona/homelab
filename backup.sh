@@ -26,4 +26,4 @@ docker run \
     --exclude cache/** \
     --exclude Backups/** \
     --exclude "/*" \
-    /homelab/** backups:backups/homelab
+    /homelab backups:backups/homelab
