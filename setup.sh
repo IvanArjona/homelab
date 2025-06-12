@@ -41,3 +41,9 @@ mkdir -p /data/torrents/movies
 mkdir -p /data/torrents/tv
 mkdir -p /data/media/movies
 mkdir -p /data/media/tv
+
+# rclone
+mkdir -p ~/.rclone
+sudo chmod +x backup.sh
+backup_cron="0 4 * * * ~/homelab/backup.sh >> ~/homelab/backup.log 2>&1"
+(crontab -l 2>/dev/null | grep -F -q "$CRON_JOB") || (crontab -l 2>/dev/null; echo "$backup_cron") | crontab -
