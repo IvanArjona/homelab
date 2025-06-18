@@ -331,26 +331,6 @@ services:
       - homepage.href=https://flaresolverr.${DOMAIN}
       - homepage.description=Bypass Cloudflare protection
 
-  byparr:
-    <<: *base
-    container_name: byparr
-    image: ghcr.io/thephaseless/byparr:latest
-    shm_size: 2gb
-    environment:
-      <<: *env
-      PROXY: 127.0.0.1:2375
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.byparr.rule=Host(`byparr.${DOMAIN}`)
-      - traefik.http.routers.byparr.entrypoints=web,websecure
-      - traefik.http.routers.byparr.tls.certresolver=resolver
-      - traefik.http.services.byparr.loadbalancer.server.port=8191
-      - homepage.group=Download
-      - homepage.name=ByParr
-      - homepage.icon=flaresolverr.png
-      - homepage.href=https://byparr.${DOMAIN}
-      - homepage.description=Bypass Cloudflare protection
-
   qbittorrent:
     <<: *base
     container_name: qbittorrent
