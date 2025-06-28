@@ -293,6 +293,24 @@ services:
       - homepage.widget.url=http://bazarr:6767
       - homepage.widget.key=${BAZARR_API_KEY}
 
+  huntarr:
+    <<: *base
+    container_name: huntarr
+    image: huntarr/huntarr:latest
+    volumes:
+      - ./huntarr:/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.huntarr.rule=Host(`huntarr.${DOMAIN}`)
+      - traefik.http.routers.huntarr.entrypoints=web,websecure
+      - traefik.http.routers.huntarr.tls.certresolver=resolver
+      - traefik.http.services.huntarr.loadbalancer.server.port=9705
+      - homepage.group=Download
+      - homepage.name=Huntarr
+      - homepage.icon=huntarr.png
+      - homepage.href=https://huntarr.${DOMAIN}
+      - homepage.description=Find Missing & Upgrade Media Items
+
   cleanuparr:
     <<: *base
     container_name: cleanuparr
