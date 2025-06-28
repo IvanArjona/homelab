@@ -293,6 +293,25 @@ services:
       - homepage.widget.url=http://bazarr:6767
       - homepage.widget.key=${BAZARR_API_KEY}
 
+  cleanuparr:
+    <<: *base
+    container_name: cleanuparr
+    image: ghcr.io/cleanuparr/cleanuparr:latest
+    user: root
+    volumes:
+      - ./cleanuparr:/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cleanuparr.rule=Host(`cleanuparr.${DOMAIN}`)
+      - traefik.http.routers.cleanuparr.entrypoints=web,websecure
+      - traefik.http.routers.cleanuparr.tls.certresolver=resolver
+      - traefik.http.services.cleanuparr.loadbalancer.server.port=11011
+      - homepage.group=Download
+      - homepage.name=Cleanuparr
+      - homepage.icon=cleanuperr.png
+      - homepage.href=https://cleanuparr.${DOMAIN}
+      - homepage.description=Media cleanup tool
+
   jackett:
     <<: *base
     container_name: jackett
