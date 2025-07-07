@@ -330,6 +330,27 @@ services:
       - homepage.href=https://cleanuparr.${DOMAIN}
       - homepage.description=Media cleanup tool
 
+  jellyseerr:
+    <<: *base
+    container_name: jellyseerr
+    image: fallenbagel/jellyseerr:latest
+    volumes:
+      - ./jellyseerr:/app/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.${DOMAIN}`)
+      - traefik.http.routers.jellyseerr.entrypoints=web,websecure
+      - traefik.http.routers.jellyseerr.tls.certresolver=resolver
+      - traefik.http.services.jellyseerr.loadbalancer.server.port=5055
+      - homepage.group=Download
+      - homepage.name=Jellyseerr
+      - homepage.icon=jellyseerr.png
+      - homepage.href=https://jellyseerr.${DOMAIN}
+      - homepage.description=Media request management
+      - homepage.widget.type=jellyseerr
+      - homepage.widget.url=http://jellyseerr:5055
+      - homepage.widget.key=${JELLYSEERR_API_KEY}
+
   jackett:
     <<: *base
     container_name: jackett
