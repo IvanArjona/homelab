@@ -35,12 +35,15 @@ services:
     <<: *base
     image: traefik:v3.4
     container_name: traefik
+    user: root
     command:
       - --api.insecure=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --providers.docker.endpoint=tcp://dockerproxy:2375
       - --entryPoints.web.address=:80
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
       - --entryPoints.websecure.address=:443
       - --certificatesresolvers.resolver.acme.dnschallenge=true
       - --certificatesresolvers.resolver.acme.dnschallenge.provider=cloudflare
@@ -585,6 +588,33 @@ services:
       - homepage.widget.type=uptimekuma
       - homepage.widget.url=http://uptimekuma:3001
       - homepage.widget.slug=status
+
+  n8n:
+    <<: *base
+    container_name: n8n
+    image: docker.n8n.io/n8nio/n8n
+    user: root
+    environment:
+      <<: *env
+      N8N_HOST: n8n.${DOMAIN}
+      N8N_PROTOCOL: https
+      WEBHOOK_URL: https://n8n.${DOMAIN}/
+      GENERIC_TIMEZONE: ${TZ}
+    ports:
+      - 5678:5678
+    volumes:
+      - ./n8n:/home/node/.n8n
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.n8n.rule=Host(`n8n.${DOMAIN}`)
+      - traefik.http.routers.n8n.entrypoints=web,websecure
+      - traefik.http.routers.n8n.tls.certresolver=resolver
+      - traefik.http.services.n8n.loadbalancer.server.port=5678
+      - homepage.group=Automation
+      - homepage.name=n8n
+      - homepage.icon=n8n.png
+      - homepage.href=https://n8n.${DOMAIN}
+      - homepage.description=Workflow automation tool
 
 networks:
   homelab:
