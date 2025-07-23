@@ -569,7 +569,6 @@ services:
       - homepage.group=Automation
       - homepage.name=Meilisearch
       - homepage.icon=meilisearch.png
-      - homepage.href=https://meilisearch.${DOMAIN}
       - homepage.description=Search engine for karakeep
 
   karakeep:
