@@ -30,6 +30,11 @@ services:
       - 127.0.0.1:2375:2375
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - homepage.group=Network
+      - homepage.name=Docker Proxy
+      - homepage.icon=docker.png
+      - homepage.description=Docker socket proxy for Traefik
 
   traefik:
     <<: *base
@@ -83,6 +88,11 @@ services:
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_DNS_API_TOKEN}
       DOMAINS: ${PUBLIC_DOMAIN}
       PROXIED: false
+    labels:
+      - homepage.group=Network
+      - homepage.name=Cloudflare DDNS
+      - homepage.icon=cloudflare.png
+      - homepage.description=Dynamic DNS updater for Cloudflare
 
   homepage:
     <<: *base
@@ -461,6 +471,10 @@ services:
       - traefik.http.routers.browserless.entrypoints=web,websecure
       - traefik.http.routers.browserless.tls.certresolver=resolver
       - traefik.http.services.browserless.loadbalancer.server.port=3000
+      - homepage.group=Automation
+      - homepage.name=Browserless Chromium
+      - homepage.icon=chromium.png
+      - homepage.description=Headless browser service
 
   changedetection:
     <<: *base
@@ -512,6 +526,11 @@ services:
     tmpfs:
       - /tmp
     command: '-s "data;/data;;no" -s "home;/home;;no" -u "${SAMBA_USER};${SAMBA_PASSWORD}" -p -n -r'
+    labels:
+      - homepage.group=Network
+      - homepage.name=Samba
+      - homepage.icon=samba-server.png
+      - homepage.description=File sharing service
 
   chrome:
     <<: *base
@@ -524,6 +543,17 @@ services:
       - --remote-debugging-address=0.0.0.0
       - --remote-debugging-port=9222
       - --hide-scrollbars
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.chrome.rule=Host(`chrome.${DOMAIN}`)
+      - traefik.http.routers.chrome.entrypoints=web,websecure
+      - traefik.http.routers.chrome.tls.certresolver=resolver
+      - traefik.http.services.chrome.loadbalancer.server.port=9222
+      - homepage.group=Automation
+      - homepage.name=Chrome
+      - homepage.icon=chrome.png
+      - homepage.href=https://chrome.${DOMAIN}
+      - homepage.description=Headless Chrome browser for karakeep
 
   meilisearch:
     <<: *base
@@ -535,6 +565,12 @@ services:
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
     volumes:
       - ./meilisearch:/meili_data
+    labels:
+      - homepage.group=Automation
+      - homepage.name=Meilisearch
+      - homepage.icon=meilisearch.png
+      - homepage.href=https://meilisearch.${DOMAIN}
+      - homepage.description=Search engine for karakeep
 
   karakeep:
     <<: *base
