@@ -220,9 +220,18 @@ services:
     <<: *base
     container_name: jellyfin
     image: jellyfin/jellyfin:latest
+    user: "${PUID}:${RENDER_GUID}"
+    environment:
+      <<: *env
+      JELLYFIN_PublishedServerUrl: https://jellyfin.${DOMAIN}
+    ports:
+      - 7359:7359/udp
+      - 1900:1900/udp
     volumes:
       - ./jellyfin:/config
       - *media
+    devices:
+      - /dev/dri:/dev/dri
     labels:
       - traefik.enable=true
       - traefik.http.routers.jellyfin.rule=Host(`jellyfin.${DOMAIN}`)
