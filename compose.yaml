@@ -38,7 +38,7 @@ services:
 
   traefik:
     <<: *base
-    image: traefik:v3.4
+    image: traefik:v3
     container_name: traefik
     user: root
     command:
@@ -111,7 +111,7 @@ services:
 
   warp:
     <<: *base
-    image: caomingjun/warp
+    image: caomingjun/warp:latest
     container_name: warp
     device_cgroup_rules:
       - 'c 10:200 rwm'
@@ -441,7 +441,7 @@ services:
   browserless:
     <<: *base
     container_name: browserless
-    image: ghcr.io/browserless/chromium
+    image: ghcr.io/browserless/chromium:latest
     user: root
     shm_size: 2gb
     environment:
@@ -464,7 +464,7 @@ services:
   changedetection:
     <<: *base
     container_name: changedetection
-    image: ghcr.io/dgtlmoon/changedetection.io
+    image: ghcr.io/dgtlmoon/changedetection.io:latest
     environment:
       <<: *env
       BASE_URL: https://changedetection.${DOMAIN}
@@ -520,7 +520,7 @@ services:
   chrome:
     <<: *base
     container_name: chrome
-    image: gcr.io/zenika-hub/alpine-chrome:123
+    image: gcr.io/zenika-hub/alpine-chrome:latest
     command:
       - --no-sandbox
       - --disable-gpu
@@ -543,7 +543,7 @@ services:
   meilisearch:
     <<: *base
     container_name: meilisearch
-    image: getmeili/meilisearch:v1.13.3
+    image: getmeili/meilisearch:latest
     environment:
       <<: *env
       MEILI_NO_ANALYTICS: true
@@ -589,7 +589,7 @@ services:
   n8n:
     <<: *base
     container_name: n8n
-    image: docker.n8n.io/n8nio/n8n
+    image: docker.n8n.io/n8nio/n8n:latest
     user: node:${DOCKER_GUID}
     environment:
       <<: *env
