@@ -586,29 +586,6 @@ services:
       - homepage.widget.url=http://karakeep:3000
       - homepage.widget.key=${KARAKEEP_API_KEY}
 
-  uptimekuma:
-    <<: *base
-    container_name: uptimekuma
-    image: louislam/uptime-kuma:2.0.0-beta.3
-    user: root
-    volumes:
-      - ./uptimekuma:/app/data
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.uptimekuma.rule=Host(`uptimekuma.${DOMAIN}`)
-      - traefik.http.routers.uptimekuma.entrypoints=web,websecure
-      - traefik.http.routers.uptimekuma.tls.certresolver=resolver
-      - traefik.http.services.uptimekuma.loadbalancer.server.port=3001
-      - homepage.group=Monitoring
-      - homepage.name=Uptime Kuma
-      - homepage.icon=uptime-kuma.png
-      - homepage.href=https://uptimekuma.${DOMAIN}
-      - homepage.description=Status monitoring
-      - homepage.widget.type=uptimekuma
-      - homepage.widget.url=http://uptimekuma:3001
-      - homepage.widget.slug=status
-
   n8n:
     <<: *base
     container_name: n8n
