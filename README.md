@@ -12,6 +12,7 @@ git clone https://github.com/IvanArjona/homelab.git
 
 ```bash
 cp .env.example .env
+chmod 600 .env
 ```
 
 ### Run the setup script
