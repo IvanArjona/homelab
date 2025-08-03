@@ -7,6 +7,8 @@ x-base: &base
   restart: unless-stopped
   environment: *env
   user: ${PUID}:${GUID}
+  dns:
+    - ${PIHOLE_IP}
   networks:
     homelab:
 
@@ -177,6 +179,9 @@ services:
     - NET_ADMIN
     - SYS_TIME
     - SYS_NICE
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
     networks:
       homelab:
         ipv4_address: ${PIHOLE_IP}
