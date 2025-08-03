@@ -25,7 +25,9 @@ services:
     environment:
       <<: *env
       CONTAINERS: 1 # Allow access to viewing containers
-      POST: 0 # Disallow any POST operations (effectively read-only)
+      IMAGES: 1 # Pull and inspect images
+      POST: 1 # Allow POST (start, stop, update containers/images)
+      DELETE: 1 # Allow removing old containers/images
     ports:
       - 127.0.0.1:2375:2375
     volumes:
@@ -93,6 +95,31 @@ services:
       - homepage.name=Cloudflare DDNS
       - homepage.icon=cloudflare.png
       - homepage.description=Dynamic DNS updater for Cloudflare
+
+  watchtower:
+    <<: *base
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    user: ${PUID}:${DOCKER_GUID}
+    environment:
+      <<: *env
+      WATCHTOWER_POLL_INTERVAL: 10800
+      WATCHTOWER_CLEANUP: true
+      WATCHTOWER_DISABLE_CONTAINERS: traefik
+      WATCHTOWER_TIMEOUT: 30s
+      WATCHTOWER_NO_STARTUP_MESSAGE: true
+      WATCHTOWER_NOTIFICATION_URL: ${WATCHTOWER_NOTIFICATION_URL}
+      WATCHTOWER_HTTP_API_TOKEN: ${WATCHTOWER_API_TOKEN}
+      WATCHTOWER_HTTP_API_METRICS: true
+      DOCKER_HOST: tcp://dockerproxy:2375
+    labels:
+      - homepage.group=Network
+      - homepage.name=Watchtower
+      - homepage.icon=watchtower.png
+      - homepage.description=Automatic Docker container updater
+      - homepage.widget.type=watchtower
+      - homepage.widget.url=http://watchtower:8080
+      - homepage.widget.key=${WATCHTOWER_API_TOKEN}
 
   homepage:
     <<: *base
