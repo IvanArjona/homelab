@@ -15,6 +15,7 @@ docker run \
     --user $(id -u):$(id -g) \
     rclone/rclone:latest \
     sync \
+    --progress \
     --skip-links \
     --exclude ".git/**" \
     --exclude "log/**" \
@@ -25,5 +26,7 @@ docker run \
     --exclude log.txt.* \
     --exclude cache/** \
     --exclude Backups/** \
+    --exclude "**/*.sock" \
+    --exclude "**/ipc-socket" \
     --exclude "/*" \
     /homelab backups:backups/homelab
