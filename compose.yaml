@@ -43,7 +43,6 @@ services:
     <<: *base
     image: traefik:v3
     container_name: traefik
-    user: root
     command:
       - --api.insecure=true
       - --providers.docker=true
@@ -64,7 +63,7 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - ./traefik/letsencrypt:/letsencrypt
+      - ./letsencrypt:/letsencrypt
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
@@ -106,7 +105,6 @@ services:
       <<: *env
       WATCHTOWER_POLL_INTERVAL: 10800
       WATCHTOWER_CLEANUP: true
-      WATCHTOWER_DISABLE_CONTAINERS: traefik
       WATCHTOWER_TIMEOUT: 30s
       WATCHTOWER_NO_STARTUP_MESSAGE: true
       WATCHTOWER_NOTIFICATION_URL: ${WATCHTOWER_NOTIFICATION_URL}
