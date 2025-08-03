@@ -438,30 +438,6 @@ services:
       - homepage.widget.username=${QBITTORRENT_USERNAME}
       - homepage.widget.password=${QBITTORRENT_PASSWORD}
 
-  homeassistant:
-    <<: *base
-    container_name: homeassistant
-    image: ghcr.io/home-assistant/home-assistant:stable
-    privileged: true
-    volumes:
-      - ./homeassistant:/config
-      - /etc/localtime:/etc/localtime:ro
-      - /run/dbus:/run/dbus:ro
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.homeassistant.rule=Host(`homeassistant.${DOMAIN}`)
-      - traefik.http.routers.homeassistant.entrypoints=web,websecure
-      - traefik.http.routers.homeassistant.tls.certresolver=resolver
-      - traefik.http.services.homeassistant.loadbalancer.server.port=8123
-      - homepage.group=Automation
-      - homepage.name=Home Assistant
-      - homepage.icon=home-assistant.png
-      - homepage.href=https://homeassistant.${DOMAIN}
-      - homepage.description=Home automation platform
-      - homepage.widget.type=homeassistant
-      - homepage.widget.url=http://homeassistant:8123
-      - homepage.widget.key=${HOMEASSISTANT_API_KEY}
-
   browserless:
     <<: *base
     container_name: browserless
