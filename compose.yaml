@@ -28,6 +28,7 @@ services:
       IMAGES: 1 # Pull and inspect images
       POST: 1 # Allow POST (start, stop, update containers/images)
       DELETE: 1 # Allow removing old containers/images
+      INFO: 1 # Allow access to Docker info
     ports:
       - 127.0.0.1:2375:2375
     volumes:
@@ -667,18 +668,11 @@ services:
     user: telegraf:${DOCKER_GUID}
     environment:
       <<: *env
-      HOST_ETC: /hostfs/etc
-      HOST_PROC: /hostfs/proc
-      HOST_SYS: /hostfs/sys
-      HOST_VAR: /hostfs/var
-      HOST_RUN: /hostfs/run
-      HOST_MOUNT_PREFIX: /hostfs
       INFLUXDB_ORGANIZATION: ${INFLUXDB_ORGANIZATION}
       INFLUXDB_BUCKET: ${INFLUXDB_BUCKET}
       INFLUXDB_API_TOKEN: ${INFLUXDB_API_TOKEN}
     volumes:
         - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-        - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - homepage.group=Monitoring
       - homepage.name=Telegraf
