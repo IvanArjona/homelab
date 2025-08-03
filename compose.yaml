@@ -573,7 +573,7 @@ services:
   meilisearch:
     <<: *base
     container_name: meilisearch
-    image: getmeili/meilisearch:latest
+    image: getmeili/meilisearch:v1.13.3
     environment:
       <<: *env
       MEILI_NO_ANALYTICS: true
