@@ -1,0 +1,11 @@
+server:
+  sources:
+    - path: /data
+      name: data
+    - path: /homelab
+      name: homelab
+      config:
+        exclude:
+          hidden: true
+auth:
+  adminUsername: homelab
