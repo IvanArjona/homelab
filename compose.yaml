@@ -157,6 +157,24 @@ services:
       - homepage.icon=cloudflare.png
       - homepage.description=Cloudflare WARP client
 
+  cloudflared:
+    <<: *base
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    command: proxy-dns
+    environment:
+      <<: *env
+      TUNNEL_DNS_UPSTREAM: https://1.0.0.1/dns-query,https://1.1.1.1/dns-query
+      TUNNEL_DNS_ADDRESS: 0.0.0.0
+    networks:
+      homelab:
+        ipv4_address: ${CLOUDFLARED_IP}
+    labels:
+      - homepage.group=Network
+      - homepage.name=Cloudflare DNS
+      - homepage.icon=cloudflare.png
+      - homepage.description=DNS over HTTPS proxy
+
   pihole:
     <<: *base
     container_name: pihole
@@ -169,7 +187,7 @@ services:
       <<: *env
       FTLCONF_webserver_api_password: ${PIHOLE_PASSWORD}
       FTLCONF_dns_listeningMode: all
-      FTLCONF_dns_upstreams: 1.1.1.1;1.0.0.1
+      FTLCONF_dns_upstreams: ${CLOUDFLARED_IP}
       PIHOLE_UID: ${PUID}
       PIHOLE_GID: ${GUID}
     volumes:
