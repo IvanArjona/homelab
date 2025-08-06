@@ -585,7 +585,7 @@ services:
       - traefik.http.services.filebrowser.loadbalancer.server.port=80
       - homepage.group=Network
       - homepage.name=File Browser
-      - homepage.icon=file-browser.png
+      - homepage.icon=filebrowser.png
       - homepage.href=https://filebrowser.${DOMAIN}
       - homepage.description=File management service
 
