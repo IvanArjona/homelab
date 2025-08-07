@@ -341,6 +341,25 @@ services:
       - homepage.widget.url=http://radarr:7878
       - homepage.widget.key=${RADARR_API_KEY}
 
+  recyclarr:
+    <<: *base
+    container_name: recyclarr
+    image: ghcr.io/recyclarr/recyclarr:latest
+    environment:
+      <<: *env
+      SONARR_API_KEY: ${SONARR_API_KEY}
+      RADARR_API_KEY: ${RADARR_API_KEY}
+    read_only: true
+    tmpfs: /tmp
+    security_opt: [no-new-privileges:true]
+    volumes:
+      - ./recyclarr:/config
+    labels:
+      - homepage.group=Download
+      - homepage.name=Recyclarr
+      - homepage.icon=recyclarr.png
+      - homepage.description=Sonarr and Radarr custom formats manager
+
   bazarr:
     <<: *base
     container_name: bazarr
