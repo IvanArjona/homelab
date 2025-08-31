@@ -33,7 +33,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
-      - homepage.group=Network
+      - homepage.group=Network tools
       - homepage.name=Docker Proxy
       - homepage.icon=docker.png
       - homepage.description=Docker socket proxy for Traefik
@@ -69,7 +69,7 @@ services:
       - traefik.http.routers.traefik.entrypoints=web,websecure
       - traefik.http.routers.traefik.tls.certresolver=resolver
       - traefik.http.services.traefik.loadbalancer.server.port=8080
-      - homepage.group=Network
+      - homepage.group=Networking
       - homepage.name=Traefik
       - homepage.icon=traefik.png
       - homepage.href=https://traefik.${DOMAIN}
@@ -90,7 +90,7 @@ services:
       DOMAINS: ${PUBLIC_DOMAIN}
       PROXIED: false
     labels:
-      - homepage.group=Network
+      - homepage.group=Networking tools
       - homepage.name=Cloudflare DDNS
       - homepage.icon=cloudflare.png
       - homepage.description=Dynamic DNS updater for Cloudflare
@@ -113,7 +113,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./watchtower:/app/config
     labels:
-      - homepage.group=Network
+      - homepage.group=Management
       - homepage.name=Watchtower
       - homepage.icon=watchtower.png
       - homepage.description=Automatic Docker container updater
@@ -152,7 +152,7 @@ services:
     volumes:
       - ./warp:/etc/warp
     labels:
-      - homepage.group=Network
+      - homepage.group=Networking tools
       - homepage.name=Cloudflare WARP
       - homepage.icon=cloudflare.png
       - homepage.description=Cloudflare WARP client
@@ -170,7 +170,7 @@ services:
       homelab:
         ipv4_address: ${CLOUDFLARED_IP}
     labels:
-      - homepage.group=Network
+      - homepage.group=Networking tools
       - homepage.name=Cloudflare DNS
       - homepage.icon=cloudflare.png
       - homepage.description=DNS over HTTPS proxy
@@ -208,7 +208,7 @@ services:
       - traefik.http.routers.pihole.entrypoints=web,websecure
       - traefik.http.routers.pihole.tls.certresolver=resolver
       - traefik.http.services.pihole.loadbalancer.server.port=80
-      - homepage.group=Network
+      - homepage.group=Networking
       - homepage.name=Pi-hole
       - homepage.icon=pi-hole.png
       - homepage.href=https://pihole.${DOMAIN}/admin/
@@ -253,7 +253,7 @@ services:
       - traefik.http.routers.wireguard.entrypoints=web,websecure
       - traefik.http.routers.wireguard.tls.certresolver=resolver
       - traefik.http.services.wireguard.loadbalancer.server.port=51821
-      - homepage.group=Network
+      - homepage.group=Networking
       - homepage.name=WireGuard
       - homepage.icon=wireguard.png
       - homepage.href=https://wireguard.${DOMAIN}
@@ -291,6 +291,7 @@ services:
       - homepage.icon=jellyfin.png
       - homepage.href=https://jellyfin.${DOMAIN}
       - homepage.description=Media server
+      - homepage.weight=0
       - homepage.widget.type=jellyfin
       - homepage.widget.url=http://jellyfin:8096
       - homepage.widget.key=${JELLYFIN_API_KEY}
@@ -314,6 +315,7 @@ services:
       - homepage.icon=sonarr.png
       - homepage.href=https://sonarr.${DOMAIN}
       - homepage.description=TV series manager
+      - homepage.weight=1
       - homepage.widget.type=sonarr
       - homepage.widget.url=http://sonarr:8989
       - homepage.widget.key=${SONARR_API_KEY}
@@ -337,6 +339,7 @@ services:
       - homepage.icon=radarr.png
       - homepage.href=https://radarr.${DOMAIN}
       - homepage.description=Movie manager
+      - homepage.weight=1
       - homepage.widget.type=radarr
       - homepage.widget.url=http://radarr:7878
       - homepage.widget.key=${RADARR_API_KEY}
@@ -431,11 +434,12 @@ services:
       - traefik.http.routers.jellyseerr.entrypoints=web,websecure
       - traefik.http.routers.jellyseerr.tls.certresolver=resolver
       - traefik.http.services.jellyseerr.loadbalancer.server.port=5055
-      - homepage.group=Download
+      - homepage.group=Media
       - homepage.name=Jellyseerr
       - homepage.icon=jellyseerr.png
       - homepage.href=https://jellyseerr.${DOMAIN}
       - homepage.description=Media request management
+      - homepage.weight=2
       - homepage.widget.type=jellyseerr
       - homepage.widget.url=http://jellyseerr:5055
       - homepage.widget.key=${JELLYSEERR_API_KEY}
@@ -472,7 +476,7 @@ services:
       - traefik.http.routers.flaresolverr.entrypoints=web,websecure
       - traefik.http.routers.flaresolverr.tls.certresolver=resolver
       - traefik.http.services.flaresolverr.loadbalancer.server.port=8191
-      - homepage.group=Download
+      - homepage.group=Networking tools
       - homepage.name=FlareSolverr
       - homepage.icon=flaresolverr.png
       - homepage.href=https://flaresolverr.${DOMAIN}
@@ -527,6 +531,7 @@ services:
       - homepage.name=Browserless Chromium
       - homepage.icon=chromium.png
       - homepage.description=Headless browser service
+      - homepage.weight=1
 
   changedetection:
     <<: *base
@@ -554,6 +559,7 @@ services:
       - homepage.icon=changedetection.png
       - homepage.href=https://changedetection.${DOMAIN}
       - homepage.description=Website change detection
+      - homepage.weight=0
       - homepage.widget.type=changedetectionio
       - homepage.widget.url=http://changedetection:5000
       - homepage.widget.key=${CHANGEDETECTION_API_KEY}
@@ -579,7 +585,7 @@ services:
       - /tmp
     command: '-s "data;/data;;no" -s "home;/home;;no" -u "${SAMBA_USER};${SAMBA_PASSWORD}" -p -n -r'
     labels:
-      - homepage.group=Network
+      - homepage.group=Management
       - homepage.name=Samba
       - homepage.icon=samba-server.png
       - homepage.description=File sharing service
@@ -602,15 +608,15 @@ services:
       - traefik.http.routers.filebrowser.entrypoints=web,websecure
       - traefik.http.routers.filebrowser.tls.certresolver=resolver
       - traefik.http.services.filebrowser.loadbalancer.server.port=80
-      - homepage.group=Network
+      - homepage.group=Management
       - homepage.name=File Browser
       - homepage.icon=filebrowser.png
       - homepage.href=https://filebrowser.${DOMAIN}
       - homepage.description=File management service
 
-  chrome:
+  karakeep-chrome:
     <<: *base
-    container_name: chrome
+    container_name: karakeep-chrome
     image: gcr.io/zenika-hub/alpine-chrome:latest
     command:
       - --no-sandbox
@@ -625,15 +631,16 @@ services:
       - traefik.http.routers.chrome.entrypoints=web,websecure
       - traefik.http.routers.chrome.tls.certresolver=resolver
       - traefik.http.services.chrome.loadbalancer.server.port=9222
-      - homepage.group=Automation
+      - homepage.group=Bookmarks
       - homepage.name=Chrome
       - homepage.icon=chrome.png
       - homepage.href=https://chrome.${DOMAIN}
       - homepage.description=Headless Chrome browser for karakeep
+      - homepage.weight=1
 
-  meilisearch:
+  karakeep-meilisearch:
     <<: *base
-    container_name: meilisearch
+    container_name: karakeep-meilisearch
     image: getmeili/meilisearch:v1.13.3
     environment:
       <<: *env
@@ -642,10 +649,11 @@ services:
     volumes:
       - ./meilisearch:/meili_data
     labels:
-      - homepage.group=Automation
+      - homepage.group=Bookmarks
       - homepage.name=Meilisearch
       - homepage.icon=meilisearch.png
       - homepage.description=Search engine for karakeep
+      - homepage.weight=1
 
   karakeep:
     <<: *base
@@ -654,9 +662,9 @@ services:
     environment:
       <<: *env
       KARAKEEP_API_KEY: ${KARAKEEP_API_KEY}
-      MEILI_ADDR: http://meilisearch:7700
+      MEILI_ADDR: http://karakeep-meilisearch:7700
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
-      BROWSER_WEB_URL: http://chrome:9222
+      BROWSER_WEB_URL: http://karakeep-chrome:9222
       DATA_DIR: /data
       NEXTAUTH_URL: https://karakeep.${DOMAIN}
       NEXTAUTH_SECRET: ${KARAKEEP_NEXTAUTH_SECRET}
@@ -668,11 +676,12 @@ services:
       - traefik.http.routers.karakeep.entrypoints=web,websecure
       - traefik.http.routers.karakeep.tls.certresolver=resolver
       - traefik.http.services.karakeep.loadbalancer.server.port=3000
-      - homepage.group=Automation
+      - homepage.group=Bookmarks
       - homepage.name=KaraKeep
       - homepage.icon=karakeep.png
       - homepage.href=https://karakeep.${DOMAIN}
       - homepage.description=Bookmarks manager
+      - homepage.weight=0
       - homepage.widget.type=karakeep
       - homepage.widget.url=http://karakeep:3000
       - homepage.widget.key=${KARAKEEP_API_KEY}
@@ -705,6 +714,7 @@ services:
       - homepage.icon=n8n.png
       - homepage.href=https://n8n.${DOMAIN}
       - homepage.description=Workflow automation tool
+      - homepage.weight=0
 
   influxdb:
     <<: *base

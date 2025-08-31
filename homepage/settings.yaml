@@ -1,0 +1,13 @@
+disableUpdateCheck: true
+
+layout:
+  Media:
+    style: row
+    columns: 4
+  Automation:
+  Bookmarks:
+  Download:
+  Management:
+  Networking:
+  Networking tools:
+  Monitoring:
