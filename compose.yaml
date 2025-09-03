@@ -33,7 +33,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
-      - homepage.group=Network tools
+      - homepage.group=Networking tools
       - homepage.name=Docker Proxy
       - homepage.icon=docker.png
       - homepage.description=Docker socket proxy for Traefik
