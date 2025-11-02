@@ -4,8 +4,5 @@ server:
       name: data
     - path: /homelab
       name: homelab
-      config:
-        exclude:
-          hidden: true
 auth:
   adminUsername: homelab
