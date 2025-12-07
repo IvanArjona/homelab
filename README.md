@@ -27,9 +27,3 @@ sudo chmod +x setup.sh
 ```bash
 docker-compose up -d
 ```
-
-### Run backups
-
-```bash
-./backup.sh
-```

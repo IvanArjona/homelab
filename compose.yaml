@@ -779,6 +779,32 @@ services:
       - homepage.widget.username=${GRAFANA_ADMIN_USER}
       - homepage.widget.password=${GRAFANA_ADMIN_PASSWORD}
 
+  duplicati:
+    <<: *base
+    container_name: duplicati
+    image: lscr.io/linuxserver/duplicati:latest
+    user: root
+    environment:
+      <<: *env
+      SETTINGS_ENCRYPTION_KEY: ${DUPLICATI_ENCRYPTION_KEY}
+      DUPLICATI__WEBSERVICE_PASSWORD: ${DUPLICATI_PASSWORD}
+    volumes:
+      - ./duplicati/config:/config
+      - ./:/homelab:z
+    ports:
+      - 8200:8200
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.duplicati.rule=Host(`duplicati.${DOMAIN}`)
+      - traefik.http.routers.duplicati.entrypoints=web,websecure
+      - traefik.http.routers.duplicati.tls.certresolver=resolver
+      - traefik.http.services.duplicati.loadbalancer.server.port=8200
+      - homepage.group=Management
+      - homepage.name=Duplicati
+      - homepage.icon=duplicati.png
+      - homepage.href=https://duplicati.${DOMAIN}
+      - homepage.description=Backup solution
+
 networks:
   homelab:
     ipam:
