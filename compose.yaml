@@ -699,6 +699,7 @@ services:
       N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: false
       WEBHOOK_URL: https://n8n.${DOMAIN}/
       GENERIC_TIMEZONE: ${TZ}
+      NODES_EXCLUDE: "[]"
     ports:
       - 5678:5678
     volumes:
