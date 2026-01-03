@@ -97,7 +97,7 @@ services:
 
   watchtower:
     <<: *base
-    image: containrrr/watchtower:latest
+    image: nickfedor/watchtower:latest
     container_name: watchtower
     user: ${PUID}:${DOCKER_GUID}
     environment:
