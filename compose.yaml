@@ -17,6 +17,7 @@ x-volumes:
   tv: &tv /data/media/tv:/data/media/tv
   movies: &movies /data/media/movies:/data/media/movies
   torrents: &torrents /data/torrents:/data/torrents
+  data: &data /data:/data
 
 services:
   dockerproxy:
@@ -302,8 +303,7 @@ services:
     image: ghcr.io/linuxserver/sonarr:latest
     volumes:
       - ./sonarr:/config
-      - *tv
-      - *torrents
+      - *data
     labels:
       - traefik.enable=true
       - traefik.http.routers.sonarr.rule=Host(`sonarr.${DOMAIN}`)
@@ -326,8 +326,7 @@ services:
     image: ghcr.io/linuxserver/radarr:latest
     volumes:
       - ./radarr:/config
-      - *movies
-      - *torrents
+      - *data
     labels:
       - traefik.enable=true
       - traefik.http.routers.radarr.rule=Host(`radarr.${DOMAIN}`)
