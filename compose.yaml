@@ -385,27 +385,28 @@ services:
       - homepage.href=https://cleanuparr.${DOMAIN}
       - homepage.description=Media cleanup tool
 
-  jellyseerr:
+  seerr:
     <<: *base
-    container_name: jellyseerr
-    image: fallenbagel/jellyseerr:latest
+    container_name: seerr
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
     volumes:
-      - ./jellyseerr:/app/config
+      - ./seerr:/app/config
     labels:
       - traefik.enable=true
-      - traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.${DOMAIN}`)
-      - traefik.http.routers.jellyseerr.entrypoints=web,websecure
-      - traefik.http.routers.jellyseerr.tls.certresolver=resolver
-      - traefik.http.services.jellyseerr.loadbalancer.server.port=5055
+      - traefik.http.routers.seerr.rule=Host(`seerr.${DOMAIN}`)
+      - traefik.http.routers.seerr.entrypoints=web,websecure
+      - traefik.http.routers.seerr.tls.certresolver=resolver
+      - traefik.http.services.seerr.loadbalancer.server.port=5055
       - homepage.group=Media
-      - homepage.name=Jellyseerr
-      - homepage.icon=jellyseerr.png
-      - homepage.href=https://jellyseerr.${DOMAIN}
+      - homepage.name=Seerr
+      - homepage.icon=seerr.png
+      - homepage.href=https://seerr.${DOMAIN}
       - homepage.description=Media request management
       - homepage.weight=2
       - homepage.widget.type=jellyseerr
-      - homepage.widget.url=http://jellyseerr:5055
-      - homepage.widget.key=${JELLYSEERR_API_KEY}
+      - homepage.widget.url=http://seerr:5055
+      - homepage.widget.key=${SEERR_API_KEY}
 
   jackett:
     <<: *base
