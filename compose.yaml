@@ -142,7 +142,7 @@ services:
     image: caomingjun/warp:latest
     container_name: warp
     device_cgroup_rules:
-      - 'c 10:200 rwm'
+      - "c 10:200 rwm"
     cap_add:
       - MKNOD
       - AUDIT_WRITE
@@ -176,9 +176,9 @@ services:
     volumes:
       - ./pihole:/etc/pihole
     cap_add:
-    - NET_ADMIN
-    - SYS_TIME
-    - SYS_NICE
+      - NET_ADMIN
+      - SYS_TIME
+      - SYS_NICE
     dns:
       - 1.1.1.1
       - 1.0.0.1
@@ -710,7 +710,7 @@ services:
       INFLUXDB_BUCKET: ${INFLUXDB_BUCKET}
       INFLUXDB_API_TOKEN: ${INFLUXDB_API_TOKEN}
     volumes:
-        - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     labels:
       - homepage.group=Monitoring
       - homepage.name=Telegraf
@@ -769,33 +769,6 @@ services:
       - homepage.icon=duplicati.png
       - homepage.href=https://duplicati.${DOMAIN}
       - homepage.description=Backup solution
-
-  homeassistant:
-    <<: *base
-    container_name: homeassistant
-    image: ghcr.io/home-assistant/home-assistant:stable
-    volumes:
-      - ./homeassistant:/config
-      - /etc/localtime:/etc/localtime:ro
-      - /run/dbus:/run/dbus:ro
-    privileged: true
-    ports:
-      - 8123:8123
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.homeassistant.rule=Host(`homeassistant.${DOMAIN}`)
-      - traefik.http.routers.homeassistant.entrypoints=web,websecure
-      - traefik.http.routers.homeassistant.tls.certresolver=resolver
-      - traefik.http.services.homeassistant.loadbalancer.server.port=8123
-      - homepage.group=Automation
-      - homepage.name=Home Assistant
-      - homepage.icon=home-assistant.png
-      - homepage.href=https://homeassistant.${DOMAIN}
-      - homepage.description=Home automation platform
-      - homepage.weight=0
-      - homepage.widget.type=homeassistant
-      - homepage.widget.url=http://homeassistant:8123
-      - homepage.widget.key=${HOMEASSISTANT_API_KEY}
 
 networks:
   homelab:
