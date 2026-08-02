@@ -9,6 +9,8 @@ x-base: &base
   user: ${PUID}:${GUID}
   dns:
     - ${PIHOLE_IP}
+    - 1.1.1.1
+    - 1.0.0.1
   networks:
     homelab:
 
@@ -227,8 +229,6 @@ services:
     volumes:
       - ./wireguard:/etc/wireguard
       - /lib/modules:/lib/modules:ro
-    dns:
-      - ${PIHOLE_IP}
     labels:
       - traefik.enable=true
       - traefik.http.routers.wireguard.rule=Host(`wireguard.${DOMAIN}`)
