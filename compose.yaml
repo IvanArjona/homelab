@@ -43,6 +43,7 @@ services:
     <<: *base
     image: traefik:v3
     container_name: traefik
+    user: root
     command:
       - --api.insecure=true
       - --providers.docker=true
@@ -63,7 +64,7 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - ./letsencrypt:/letsencrypt
+      - letsencrypt:/letsencrypt
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
@@ -697,6 +698,9 @@ services:
       - homepage.icon=duplicati.png
       - homepage.href=https://duplicati.${DOMAIN}
       - homepage.description=Backup solution
+
+volumes:
+  letsencrypt:
 
 networks:
   homelab:
