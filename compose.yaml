@@ -14,8 +14,6 @@ x-base: &base
 
 x-volumes:
   media: &media /data/media:/data/media
-  tv: &tv /data/media/tv:/data/media/tv
-  movies: &movies /data/media/movies:/data/media/movies
   torrents: &torrents /data/torrents:/data/torrents
   data: &data /data:/data
 
