@@ -1,0 +1,26 @@
+name: Env Check
+
+on: [push, pull_request]
+
+jobs:
+  env-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check env vars are documented
+        run: |
+          # Extract ${VAR} references from compose.yaml
+          vars=$(grep -oP '\$\{\K\w+' compose.yaml | sort -u)
+          missing=0
+          for var in $vars; do
+            if ! grep -q "^$var=" .env.example; then
+              echo "::warning::$var is used in compose.yaml but missing from .env.example"
+              missing=$((missing + 1))
+            fi
+          done
+          if [ "$missing" -gt 0 ]; then
+            echo "::error::$missing variable(s) missing from .env.example"
+            exit 1
+          fi
+          echo "All variables documented ✓"
