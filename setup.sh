@@ -32,9 +32,9 @@ sudo systemctl restart systemd-resolved
 
 # Install iptables and ip6tables for wireguard
 sudo modprobe iptable_nat
-echo "iptable_nat" | sudo tee -a /etc/modules
+grep -q "iptable_nat" /etc/modules || echo "iptable_nat" | sudo tee -a /etc/modules
 sudo modprobe ip6table_nat
-echo "ip6table_nat" | sudo tee -a /etc/modules
+grep -q "ip6table_nat" /etc/modules || echo "ip6table_nat" | sudo tee -a /etc/modules
 
 # Create data directory
 source .env
