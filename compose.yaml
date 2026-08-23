@@ -53,6 +53,8 @@ services:
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
       - --entryPoints.websecure.address=:443
+      - --entrypoints.websecure.http.tls.certresolver=resolver
+      - --entrypoints.websecure.asDefault=true
       - --certificatesresolvers.resolver.acme.dnschallenge=true
       - --certificatesresolvers.resolver.acme.dnschallenge.provider=cloudflare
       - --certificatesresolvers.resolver.acme.email=postmaster@${DOMAIN}
@@ -68,8 +70,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
-      - traefik.http.routers.traefik.entrypoints=web,websecure
-      - traefik.http.routers.traefik.tls.certresolver=resolver
       - traefik.http.services.traefik.loadbalancer.server.port=8080
       - homepage.group=Networking
       - homepage.name=Traefik
@@ -134,8 +134,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.homepage.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.homepage.entrypoints=web,websecure
-      - traefik.http.routers.homepage.tls.certresolver=resolver
       - traefik.http.services.homepage.loadbalancer.server.port=3000
 
   warp:
@@ -189,8 +187,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.pihole.rule=Host(`pihole.${DOMAIN}`)
-      - traefik.http.routers.pihole.entrypoints=web,websecure
-      - traefik.http.routers.pihole.tls.certresolver=resolver
       - traefik.http.services.pihole.loadbalancer.server.port=80
       - homepage.group=Networking
       - homepage.name=Pi-hole
@@ -232,8 +228,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.wireguard.rule=Host(`wireguard.${DOMAIN}`)
-      - traefik.http.routers.wireguard.entrypoints=web,websecure
-      - traefik.http.routers.wireguard.tls.certresolver=resolver
       - traefik.http.services.wireguard.loadbalancer.server.port=51821
       - homepage.group=Networking
       - homepage.name=WireGuard
@@ -265,8 +259,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.jellyfin.rule=Host(`jellyfin.${DOMAIN}`)
-      - traefik.http.routers.jellyfin.entrypoints=web,websecure
-      - traefik.http.routers.jellyfin.tls.certresolver=resolver
       - traefik.http.services.jellyfin.loadbalancer.server.port=8096
       - homepage.group=Media
       - homepage.name=Jellyfin
@@ -288,8 +280,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.sonarr.rule=Host(`sonarr.${DOMAIN}`)
-      - traefik.http.routers.sonarr.entrypoints=web,websecure
-      - traefik.http.routers.sonarr.tls.certresolver=resolver
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
       - homepage.group=Media
       - homepage.name=Sonarr
@@ -311,8 +301,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.radarr.rule=Host(`radarr.${DOMAIN}`)
-      - traefik.http.routers.radarr.entrypoints=web,websecure
-      - traefik.http.routers.radarr.tls.certresolver=resolver
       - traefik.http.services.radarr.loadbalancer.server.port=7878
       - homepage.group=Media
       - homepage.name=Radarr
@@ -353,8 +341,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.bazarr.rule=Host(`bazarr.${DOMAIN}`)
-      - traefik.http.routers.bazarr.entrypoints=web,websecure
-      - traefik.http.routers.bazarr.tls.certresolver=resolver
       - traefik.http.services.bazarr.loadbalancer.server.port=6767
       - homepage.group=Download
       - homepage.name=Bazarr
@@ -375,8 +361,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.cleanuparr.rule=Host(`cleanuparr.${DOMAIN}`)
-      - traefik.http.routers.cleanuparr.entrypoints=web,websecure
-      - traefik.http.routers.cleanuparr.tls.certresolver=resolver
       - traefik.http.services.cleanuparr.loadbalancer.server.port=11011
       - homepage.group=Download
       - homepage.name=Cleanuparr
@@ -394,8 +378,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.seerr.rule=Host(`seerr.${DOMAIN}`)
-      - traefik.http.routers.seerr.entrypoints=web,websecure
-      - traefik.http.routers.seerr.tls.certresolver=resolver
       - traefik.http.services.seerr.loadbalancer.server.port=5055
       - homepage.group=Media
       - homepage.name=Seerr
@@ -417,8 +399,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.jackett.rule=Host(`jackett.${DOMAIN}`)
-      - traefik.http.routers.jackett.entrypoints=web,websecure
-      - traefik.http.routers.jackett.tls.certresolver=resolver
       - traefik.http.services.jackett.loadbalancer.server.port=9117
       - homepage.group=Download
       - homepage.name=Jackett
@@ -436,8 +416,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.flaresolverr.rule=Host(`flaresolverr.${DOMAIN}`)
-      - traefik.http.routers.flaresolverr.entrypoints=web,websecure
-      - traefik.http.routers.flaresolverr.tls.certresolver=resolver
       - traefik.http.services.flaresolverr.loadbalancer.server.port=8191
       - homepage.group=Networking tools
       - homepage.name=FlareSolverr
@@ -459,8 +437,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${DOMAIN}`)
-      - traefik.http.routers.qbittorrent.entrypoints=web,websecure
-      - traefik.http.routers.qbittorrent.tls.certresolver=resolver
       - traefik.http.services.qbittorrent.loadbalancer.server.port=8080
       - homepage.group=Download
       - homepage.name=qBittorrent
@@ -487,8 +463,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.browserless.rule=Host(`browserless.${DOMAIN}`)
-      - traefik.http.routers.browserless.entrypoints=web,websecure
-      - traefik.http.routers.browserless.tls.certresolver=resolver
       - traefik.http.services.browserless.loadbalancer.server.port=3000
       - homepage.group=Automation
       - homepage.name=Browserless Chromium
@@ -514,8 +488,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.changedetection.rule=Host(`changedetection.${DOMAIN}`)
-      - traefik.http.routers.changedetection.entrypoints=web,websecure
-      - traefik.http.routers.changedetection.tls.certresolver=resolver
       - traefik.http.services.changedetection.loadbalancer.server.port=5000
       - homepage.group=Automation
       - homepage.name=ChangeDetection
@@ -568,8 +540,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.filebrowser.rule=Host(`filebrowser.${DOMAIN}`)
-      - traefik.http.routers.filebrowser.entrypoints=web,websecure
-      - traefik.http.routers.filebrowser.tls.certresolver=resolver
       - traefik.http.services.filebrowser.loadbalancer.server.port=80
       - homepage.group=Management
       - homepage.name=File Browser
@@ -598,8 +568,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.n8n.rule=Host(`n8n.${DOMAIN}`)
-      - traefik.http.routers.n8n.entrypoints=web,websecure
-      - traefik.http.routers.n8n.tls.certresolver=resolver
       - traefik.http.services.n8n.loadbalancer.server.port=5678
       - homepage.group=Automation
       - homepage.name=n8n
@@ -617,8 +585,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.influxdb.rule=Host(`influxdb.${DOMAIN}`)
-      - traefik.http.routers.influxdb.entrypoints=web,websecure
-      - traefik.http.routers.influxdb.tls.certresolver=resolver
       - traefik.http.services.influxdb.loadbalancer.server.port=8086
       - homepage.group=Monitoring
       - homepage.name=influxdb
@@ -657,8 +623,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)
-      - traefik.http.routers.grafana.entrypoints=web,websecure
-      - traefik.http.routers.grafana.tls.certresolver=resolver
       - traefik.http.services.grafana.loadbalancer.server.port=3000
       - homepage.group=Monitoring
       - homepage.name=Grafana
@@ -688,8 +652,6 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.duplicati.rule=Host(`duplicati.${DOMAIN}`)
-      - traefik.http.routers.duplicati.entrypoints=web,websecure
-      - traefik.http.routers.duplicati.tls.certresolver=resolver
       - traefik.http.services.duplicati.loadbalancer.server.port=8200
       - homepage.group=Management
       - homepage.name=Duplicati
