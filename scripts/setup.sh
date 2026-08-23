@@ -37,10 +37,12 @@ sudo modprobe ip6table_nat
 grep -q "ip6table_nat" /etc/modules || echo "ip6table_nat" | sudo tee -a /etc/modules
 
 # Create data directory
-source .env
+PUID=$(grep -m1 '^PUID=' .env | cut -d= -f2)
+GUID=$(grep -m1 '^GUID=' .env | cut -d= -f2)
 sudo mkdir -p /data
-sudo chown $PUID:$GUID /data
-mkdir -p /data/torrents/movies
-mkdir -p /data/torrents/tv
-mkdir -p /data/media/movies
-mkdir -p /data/media/tv
+sudo chown "${PUID}:${GUID}" /data
+sudo -u "#${PUID}" mkdir -p \
+  /data/torrents/movies \
+  /data/torrents/tv \
+  /data/media/movies \
+  /data/media/tv
