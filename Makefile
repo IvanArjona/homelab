@@ -5,11 +5,11 @@ COMPOSE = docker compose
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-up: ## Start all services
-	$(COMPOSE) up -d
+up: ## Start all services (or pass s=<service>)
+	$(COMPOSE) up -d $(s)
 
-down: ## Stop all services
-	$(COMPOSE) down
+down: ## Stop all services (or pass s=<service>)
+	$(COMPOSE) down $(s)
 
 restart: ## Restart all services (or pass s=<service>)
 	$(COMPOSE) restart $(s)
