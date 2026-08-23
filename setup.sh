@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
 # Add Docker's official GPG key:
 sudo apt update
 sudo apt install -y ca-certificates curl
