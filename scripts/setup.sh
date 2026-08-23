@@ -1,48 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Add Docker's official GPG key:
-sudo apt update
-sudo apt install -y ca-certificates curl
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
+# ──────────────────────────────────────────────────────────────────────────────
+# Homelab server setup (Ubuntu)
+# Run as your regular user — the script uses sudo where needed.
+# Safe to run multiple times (idempotent).
+# ──────────────────────────────────────────────────────────────────────────────
 
-# Add the Docker repository to Apt sources:
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt update
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Install the docker packages
-sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+source "$SCRIPT_DIR/common.sh"
 
-# Add the current user to the docker group
-sudo groupadd -f docker
-sudo usermod -aG docker $USER
+info "Starting homelab setup..."
 
-# Configure Docker to start on boot with systemd
-sudo systemctl enable docker.service
-sudo systemctl enable containerd.service
+source "$SCRIPT_DIR/install-docker.sh"
+source "$SCRIPT_DIR/configure-dns.sh"
+source "$SCRIPT_DIR/configure-kernel.sh"
+source "$SCRIPT_DIR/create-directories.sh"
 
-# Free up port 53 for pihole
-sudo sed -i 's/^\#DNSStubListener=yes$/DNSStubListener=no/' /etc/systemd/resolved.conf
-sudo systemctl restart systemd-resolved
-
-# Install iptables and ip6tables for wireguard
-sudo modprobe iptable_nat
-grep -q "iptable_nat" /etc/modules || echo "iptable_nat" | sudo tee -a /etc/modules
-sudo modprobe ip6table_nat
-grep -q "ip6table_nat" /etc/modules || echo "ip6table_nat" | sudo tee -a /etc/modules
-
-# Create data directory
-PUID=$(grep -m1 '^PUID=' .env | cut -d= -f2)
-GUID=$(grep -m1 '^GUID=' .env | cut -d= -f2)
-sudo mkdir -p /data
-sudo chown "${PUID}:${GUID}" /data
-sudo -u "#${PUID}" mkdir -p \
-  /data/torrents/movies \
-  /data/torrents/tv \
-  /data/media/movies \
-  /data/media/tv
+info "Setup complete!"
