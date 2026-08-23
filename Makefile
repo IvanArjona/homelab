@@ -34,5 +34,9 @@ setup: ## Run initial server setup
 shell: ## Open a shell in a running container (pass s=<service>)
 	$(COMPOSE) exec $(s) sh
 
+update: ## Pull latest changes (reset local modifications)
+	git clean -fd
+	git pull
+
 validate: ## Validate compose file
 	$(COMPOSE) config --quiet && echo "compose.yaml is valid"

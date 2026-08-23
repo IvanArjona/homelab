@@ -39,7 +39,7 @@ make logs          # Tail logs (or: make logs s=traefik)
 make ps            # List running containers
 make status        # Show CPU/memory usage per container
 make pull          # Pull latest images
-make update        # Pull and recreate changed containers
+make update        # Pull latest changes (reset local modifications)
 make validate      # Validate compose file
 make clean         # Remove stopped containers and dangling images
 make backup        # Create a tarball of config directories
