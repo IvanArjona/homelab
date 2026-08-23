@@ -204,6 +204,15 @@
         container: duplicati
         ping: http://duplicati:8200
 
+- Finance:
+    - Ghostfolio:
+        icon: ghostfolio.png
+        href: https://ghostfolio.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Wealth management
+        server: docker
+        container: ghostfolio
+        ping: http://ghostfolio:3333
+
 - Monitoring:
     - InfluxDB:
         icon: influxdb.png

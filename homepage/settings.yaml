@@ -5,9 +5,9 @@ layout:
     style: row
     columns: 4
   Automation:
-  Bookmarks:
   Download:
   Management:
+  Finance:
   Networking:
   Networking tools:
   Monitoring:
