@@ -263,7 +263,7 @@ services:
   recyclarr:
     <<: *base
     container_name: recyclarr
-    image: ghcr.io/recyclarr/recyclarr:latest
+    image: ghcr.io/recyclarr/recyclarr:8
     environment:
       <<: *env
       SONARR_API_KEY: ${SONARR_API_KEY}
