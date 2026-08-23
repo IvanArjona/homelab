@@ -9,4 +9,4 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run ShellCheck
-        run: find scripts -name '*.sh' -print0 | xargs -0 shellcheck
+        run: find scripts -name '*.sh' -print0 | xargs -0 shellcheck -x
