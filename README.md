@@ -6,6 +6,7 @@
 
 ```bash
 git clone https://github.com/IvanArjona/homelab.git
+cd homelab
 ```
 
 ### Copy the example environment file
@@ -18,12 +19,38 @@ chmod 600 .env
 ### Run the setup script
 
 ```bash
-sudo chmod +x setup.sh
-./setup.sh
+make setup
 ```
 
-### Run docker compose
+### Start all services
 
 ```bash
-docker-compose up -d
+make up
+```
+
+## Usage
+
+```bash
+make help          # Show all available commands
+make up            # Start all services
+make down          # Stop all services
+make restart       # Restart all services (or: make restart s=jellyfin)
+make logs          # Tail logs (or: make logs s=traefik)
+make ps            # List running containers
+make status        # Show CPU/memory usage per container
+make pull          # Pull latest images
+make update        # Pull and recreate changed containers
+make validate      # Validate compose file
+make clean         # Remove stopped containers and dangling images
+make backup        # Create a tarball of config directories
+make shell s=NAME  # Open a shell in a container
+make recreate s=N  # Force recreate a service
+```
+
+## Post-startup
+
+Some services generate API keys on first run. After starting, grab the keys from each service's UI and update your `.env` file, then restart:
+
+```bash
+make restart
 ```
