@@ -44,6 +44,9 @@ services:
     image: traefik:v3
     container_name: traefik
     user: root
+    depends_on:
+      dockerproxy:
+        condition: service_started
     command:
       - --api.insecure=true
       - --providers.docker=true
@@ -102,6 +105,9 @@ services:
     image: nickfedor/watchtower:latest
     container_name: watchtower
     user: ${PUID}:${DOCKER_GUID}
+    depends_on:
+      dockerproxy:
+        condition: service_started
     environment:
       <<: *env
       WATCHTOWER_POLL_INTERVAL: 10800
@@ -127,6 +133,9 @@ services:
     <<: *base
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
+    depends_on:
+      dockerproxy:
+        condition: service_started
     volumes:
       - ./homepage:/app/config
     environment:
@@ -597,6 +606,11 @@ services:
     container_name: telegraf
     image: telegraf:latest
     user: telegraf:${DOCKER_GUID}
+    depends_on:
+      influxdb:
+        condition: service_started
+      dockerproxy:
+        condition: service_started
     environment:
       <<: *env
       INFLUXDB_ORGANIZATION: ${INFLUXDB_ORGANIZATION}
@@ -614,6 +628,9 @@ services:
     <<: *base
     container_name: grafana
     image: grafana/grafana:latest
+    depends_on:
+      influxdb:
+        condition: service_started
     environment:
       <<: *env
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
