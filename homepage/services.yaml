@@ -1,0 +1,231 @@
+- Networking:
+    - Traefik:
+        icon: traefik.png
+        href: https://traefik.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Reverse proxy
+        server: docker
+        container: traefik
+        widget:
+          type: traefik
+          url: http://traefik:8080
+    - Pi-hole:
+        icon: pi-hole.png
+        href: https://pihole.{{HOMEPAGE_VAR_DOMAIN}}/admin/
+        description: DNS server
+        server: docker
+        container: pihole
+        widget:
+          type: pihole
+          url: http://pihole
+          key: "{{HOMEPAGE_VAR_PIHOLE_PASSWORD}}"
+          version: 6
+    - WireGuard:
+        icon: wireguard.png
+        href: https://wireguard.{{HOMEPAGE_VAR_DOMAIN}}
+        description: VPN server
+        server: docker
+        container: wireguard
+        widget:
+          type: wgeasy
+          url: http://wireguard:51821
+          version: 2
+          username: "{{HOMEPAGE_VAR_WIREGUARD_USER}}"
+          password: "{{HOMEPAGE_VAR_WIREGUARD_PASSWORD}}"
+
+- Networking tools:
+    - Docker Proxy:
+        icon: docker.png
+        description: Docker socket proxy for Traefik
+        server: docker
+        container: dockerproxy
+    - Cloudflare DDNS:
+        icon: cloudflare.png
+        description: Dynamic DNS updater for Cloudflare
+        server: docker
+        container: cloudflareddns
+    - Cloudflare WARP:
+        icon: cloudflare.png
+        description: Cloudflare WARP client
+        server: docker
+        container: warp
+    - FlareSolverr:
+        icon: flaresolverr.png
+        href: https://flaresolverr.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Bypass Cloudflare protection
+        server: docker
+        container: flaresolverr
+        ping: http://flaresolverr:8191
+
+- Media:
+    - Jellyfin:
+        icon: jellyfin.png
+        href: https://jellyfin.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Media server
+        weight: 0
+        server: docker
+        container: jellyfin
+        widget:
+          type: jellyfin
+          url: http://jellyfin:8096
+          key: "{{HOMEPAGE_VAR_JELLYFIN_API_KEY}}"
+    - Sonarr:
+        icon: sonarr.png
+        href: https://sonarr.{{HOMEPAGE_VAR_DOMAIN}}
+        description: TV series manager
+        weight: 1
+        server: docker
+        container: sonarr
+        widget:
+          type: sonarr
+          url: http://sonarr:8989
+          key: "{{HOMEPAGE_VAR_SONARR_API_KEY}}"
+    - Radarr:
+        icon: radarr.png
+        href: https://radarr.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Movie manager
+        weight: 1
+        server: docker
+        container: radarr
+        widget:
+          type: radarr
+          url: http://radarr:7878
+          key: "{{HOMEPAGE_VAR_RADARR_API_KEY}}"
+    - Seerr:
+        icon: seerr.png
+        href: https://seerr.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Media request management
+        weight: 2
+        server: docker
+        container: seerr
+        widget:
+          type: seerr
+          url: http://seerr:5055
+          key: "{{HOMEPAGE_VAR_SEERR_API_KEY}}"
+
+- Download:
+    - Recyclarr:
+        icon: recyclarr.png
+        description: Sonarr and Radarr custom formats manager
+        server: docker
+        container: recyclarr
+    - Bazarr:
+        icon: bazarr.png
+        href: https://bazarr.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Subtitle manager
+        server: docker
+        container: bazarr
+        widget:
+          type: bazarr
+          url: http://bazarr:6767
+          key: "{{HOMEPAGE_VAR_BAZARR_API_KEY}}"
+    - Cleanuparr:
+        icon: cleanuperr.png
+        href: https://cleanuparr.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Media cleanup tool
+        server: docker
+        container: cleanuparr
+        ping: http://cleanuparr:11011
+    - Jackett:
+        icon: jackett.png
+        href: https://jackett.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Torrent indexer aggregator
+        server: docker
+        container: jackett
+        widget:
+          type: jackett
+          url: http://jackett:9117
+          password: "{{HOMEPAGE_VAR_JACKETT_PASSWORD}}"
+    - qBittorrent:
+        icon: qbittorrent.png
+        href: https://qbittorrent.{{HOMEPAGE_VAR_DOMAIN}}
+        description: BitTorrent client
+        server: docker
+        container: qbittorrent
+        widget:
+          type: qbittorrent
+          url: http://qbittorrent:8080
+          username: "{{HOMEPAGE_VAR_QBITTORRENT_USERNAME}}"
+          password: "{{HOMEPAGE_VAR_QBITTORRENT_PASSWORD}}"
+
+- Automation:
+    - ChangeDetection:
+        icon: changedetection.png
+        href: https://changedetection.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Website change detection
+        weight: 0
+        server: docker
+        container: changedetection
+        widget:
+          type: changedetectionio
+          url: http://changedetection:5000
+          key: "{{HOMEPAGE_VAR_CHANGEDETECTION_API_KEY}}"
+    - n8n:
+        icon: n8n.png
+        href: https://n8n.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Workflow automation tool
+        weight: 0
+        server: docker
+        container: n8n
+        ping: http://n8n:5678
+    - Browserless Chromium:
+        icon: chromium.png
+        description: Headless browser service
+        weight: 1
+        server: docker
+        container: browserless
+
+- Management:
+    - Watchtower:
+        icon: watchtower.png
+        description: Automatic Docker container updater
+        server: docker
+        container: watchtower
+        widget:
+          type: watchtower
+          url: http://watchtower:8080
+          key: "{{HOMEPAGE_VAR_WATCHTOWER_API_TOKEN}}"
+    - Samba:
+        icon: samba-server.png
+        description: File sharing service
+        server: docker
+        container: samba
+    - File Browser:
+        icon: filebrowser.png
+        href: https://filebrowser.{{HOMEPAGE_VAR_DOMAIN}}
+        description: File management service
+        server: docker
+        container: filebrowser
+        ping: http://filebrowser:80
+    - Duplicati:
+        icon: duplicati.png
+        href: https://duplicati.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Backup solution
+        server: docker
+        container: duplicati
+        ping: http://duplicati:8200
+
+- Monitoring:
+    - InfluxDB:
+        icon: influxdb.png
+        href: https://influxdb.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Time series database
+        server: docker
+        container: influxdb
+        ping: http://influxdb:8086
+    - Telegraf:
+        icon: telegraf.png
+        description: Metrics collector
+        server: docker
+        container: telegraf
+    - Grafana:
+        icon: grafana.png
+        href: https://grafana.{{HOMEPAGE_VAR_DOMAIN}}/
+        description: Visualization tool
+        server: docker
+        container: grafana
+        widget:
+          type: grafana
+          version: 2
+          url: http://grafana:3000
+          username: "{{HOMEPAGE_VAR_GRAFANA_ADMIN_USER}}"
+          password: "{{HOMEPAGE_VAR_GRAFANA_ADMIN_PASSWORD}}"
