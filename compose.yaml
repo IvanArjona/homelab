@@ -547,6 +547,7 @@ services:
     <<: *base
     container_name: ghostfolio-postgres
     image: docker.io/library/postgres:15-alpine
+    user: root
     cap_drop:
       - ALL
     cap_add:
