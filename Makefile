@@ -35,6 +35,7 @@ shell: ## Open a shell in a running container (pass s=<service>)
 	$(COMPOSE) exec $(s) sh
 
 update: ## Pull latest changes (reset local modifications)
+	git checkout .
 	git clean -fd
 	git pull
 
