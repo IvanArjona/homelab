@@ -28,8 +28,8 @@ clean: ## Remove stopped containers, dangling images, and unused volumes
 	docker volume prune -f
 
 setup: ## Run initial server setup
-	chmod +x setup.sh
-	./setup.sh
+	chmod +x scripts/setup.sh
+	./scripts/setup.sh
 
 shell: ## Open a shell in a running container (pass s=<service>)
 	$(COMPOSE) exec $(s) sh
