@@ -8,6 +8,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ludeeus/action-shellcheck@master
-        with:
-          scandir: ./scripts
+      - name: Run ShellCheck
+        run: find scripts -name '*.sh' -print0 | xargs -0 shellcheck
