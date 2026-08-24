@@ -175,6 +175,13 @@
         container: browserless
 
 - Management:
+    - Dockge:
+        icon: dockge.png
+        href: https://dockge.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Docker compose stack manager
+        server: docker
+        container: dockge
+        ping: http://dockge:5001
     - Watchtower:
         icon: watchtower.png
         description: Automatic Docker container updater

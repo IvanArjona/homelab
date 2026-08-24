@@ -561,6 +561,22 @@ services:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
 
+  dockge:
+    <<: *base
+    container_name: dockge
+    image: louislam/dockge:1
+    user: root
+    volumes:
+      - ./dockge:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dockge.rule=Host(`dockge.${DOMAIN}`)
+      - traefik.http.services.dockge.loadbalancer.server.port=5001
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5001"]
+
   duplicati:
     <<: *base
     container_name: duplicati
