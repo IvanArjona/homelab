@@ -3,6 +3,11 @@ x-env: &env
   GUID: ${GUID}
   TZ: ${TZ}
 
+x-healthcheck: &healthcheck
+  interval: 30s
+  timeout: 5s
+  retries: 3
+
 x-base: &base
   restart: unless-stopped
   environment: *env
@@ -33,6 +38,9 @@ services:
       - 127.0.0.1:2375:2375
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:2375/version"]
 
   traefik:
     <<: *base
@@ -41,9 +49,10 @@ services:
     user: root
     depends_on:
       dockerproxy:
-        condition: service_started
+        condition: service_healthy
     command:
       - --api.insecure=true
+      - --ping=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --providers.docker.endpoint=tcp://dockerproxy:2375
@@ -69,6 +78,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
       - traefik.http.services.traefik.loadbalancer.server.port=8080
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
 
   cloudflareddns:
     <<: *base
@@ -109,7 +121,7 @@ services:
     container_name: homepage
     depends_on:
       dockerproxy:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - ./homepage:/app/config
     environment:
@@ -134,6 +146,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.homepage.rule=Host(`${DOMAIN}`)
       - traefik.http.services.homepage.loadbalancer.server.port=3000
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
 
   warp:
     <<: *base
@@ -182,6 +197,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.pihole.rule=Host(`pihole.${DOMAIN}`)
       - traefik.http.services.pihole.loadbalancer.server.port=80
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "dig", "+short", "+time=2", "+tries=1", "@127.0.0.1", "healthcheck.pi-hole.net"]
 
   wireguard:
     <<: *base
@@ -214,6 +232,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.wireguard.rule=Host(`wireguard.${DOMAIN}`)
       - traefik.http.services.wireguard.loadbalancer.server.port=51821
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://0.0.0.0:51821"]
 
   jellyfin:
     <<: *base
@@ -235,6 +256,10 @@ services:
       - traefik.enable=true
       - traefik.http.routers.jellyfin.rule=Host(`jellyfin.${DOMAIN}`)
       - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
+      timeout: 10s
 
   sonarr:
     <<: *base
@@ -247,6 +272,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.sonarr.rule=Host(`sonarr.${DOMAIN}`)
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:8989/ping"]
 
   radarr:
     <<: *base
@@ -259,6 +287,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.radarr.rule=Host(`radarr.${DOMAIN}`)
       - traefik.http.services.radarr.loadbalancer.server.port=7878
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:7878/ping"]
 
   recyclarr:
     <<: *base
@@ -285,6 +316,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.bazarr.rule=Host(`bazarr.${DOMAIN}`)
       - traefik.http.services.bazarr.loadbalancer.server.port=6767
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:6767/ping"]
 
   cleanuparr:
     <<: *base
@@ -297,6 +331,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.cleanuparr.rule=Host(`cleanuparr.${DOMAIN}`)
       - traefik.http.services.cleanuparr.loadbalancer.server.port=11011
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:11011"]
 
   seerr:
     <<: *base
@@ -309,6 +346,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.seerr.rule=Host(`seerr.${DOMAIN}`)
       - traefik.http.services.seerr.loadbalancer.server.port=5055
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5055/api/v1/status"]
 
   jackett:
     <<: *base
@@ -321,6 +361,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.jackett.rule=Host(`jackett.${DOMAIN}`)
       - traefik.http.services.jackett.loadbalancer.server.port=9117
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:9117/UI/Dashboard"]
 
   flaresolverr:
     <<: *base
@@ -330,6 +373,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.flaresolverr.rule=Host(`flaresolverr.${DOMAIN}`)
       - traefik.http.services.flaresolverr.loadbalancer.server.port=8191
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:8191/health"]
 
   qbittorrent:
     <<: *base
@@ -346,6 +392,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${DOMAIN}`)
       - traefik.http.services.qbittorrent.loadbalancer.server.port=8080
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
 
   browserless:
     <<: *base
@@ -363,6 +412,10 @@ services:
       - traefik.enable=true
       - traefik.http.routers.browserless.rule=Host(`browserless.${DOMAIN}`)
       - traefik.http.services.browserless.loadbalancer.server.port=3000
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:3000/active?token=${BROWSERLESS_CHROMIUM_TOKEN}"]
+      start_period: 30s
 
   changedetection:
     <<: *base
@@ -378,11 +431,15 @@ services:
       - ./changedetection/datastore:/datastore
     depends_on:
       browserless:
-        condition: service_started
+        condition: service_healthy
     labels:
       - traefik.enable=true
       - traefik.http.routers.changedetection.rule=Host(`changedetection.${DOMAIN}`)
       - traefik.http.services.changedetection.loadbalancer.server.port=5000
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000')"]
+      start_period: 30s
 
   samba:
     <<: *base
@@ -421,6 +478,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.filebrowser.rule=Host(`filebrowser.${DOMAIN}`)
       - traefik.http.services.filebrowser.loadbalancer.server.port=80
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/health"]
 
   n8n:
     <<: *base
@@ -444,6 +504,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.n8n.rule=Host(`n8n.${DOMAIN}`)
       - traefik.http.services.n8n.loadbalancer.server.port=5678
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5678/healthz"]
 
   influxdb:
     <<: *base
@@ -455,6 +518,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.influxdb.rule=Host(`influxdb.${DOMAIN}`)
       - traefik.http.services.influxdb.loadbalancer.server.port=8086
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
 
   telegraf:
     <<: *base
@@ -463,9 +529,9 @@ services:
     user: telegraf:${DOCKER_GUID}
     depends_on:
       influxdb:
-        condition: service_started
+        condition: service_healthy
       dockerproxy:
-        condition: service_started
+        condition: service_healthy
     environment:
       <<: *env
       INFLUXDB_ORGANIZATION: ${INFLUXDB_ORGANIZATION}
@@ -480,7 +546,7 @@ services:
     image: grafana/grafana:latest
     depends_on:
       influxdb:
-        condition: service_started
+        condition: service_healthy
     environment:
       <<: *env
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
@@ -491,6 +557,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)
       - traefik.http.services.grafana.loadbalancer.server.port=3000
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
 
   duplicati:
     <<: *base
@@ -510,6 +579,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.duplicati.rule=Host(`duplicati.${DOMAIN}`)
       - traefik.http.services.duplicati.loadbalancer.server.port=8200
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:8200"]
 
 volumes:
   letsencrypt:
