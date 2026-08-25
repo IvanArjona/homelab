@@ -64,6 +64,8 @@ services:
       - --entrypoints.websecure.asDefault=true
       - --certificatesresolvers.resolver.acme.dnschallenge=true
       - --certificatesresolvers.resolver.acme.dnschallenge.provider=cloudflare
+      - --certificatesresolvers.resolver.acme.dnschallenge.resolvers=${PIHOLE_IP}:53
+      - --certificatesresolvers.resolver.acme.dnschallenge.delaybeforecheck=30
       - --certificatesresolvers.resolver.acme.email=postmaster@${DOMAIN}
       - --certificatesresolvers.resolver.acme.storage=/letsencrypt/acme.json
     environment:
