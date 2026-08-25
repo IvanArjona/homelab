@@ -1,4 +1,4 @@
-.PHONY: up down restart pull logs status ps clean update setup help
+.PHONY: up down restart pull recreate logs status ps clean update setup help
 
 COMPOSE = docker compose
 
@@ -13,6 +13,12 @@ down: ## Stop all services (or pass s=<service>)
 
 restart: ## Restart all services (or pass s=<service>)
 	$(COMPOSE) restart $(s)
+
+pull: ## Pull latest images (or pass s=<service>)
+	$(COMPOSE) pull $(s)
+
+recreate: ## Force recreate a service (pass s=<service>)
+	$(COMPOSE) up -d --force-recreate $(s)
 
 logs: ## Tail logs (or pass s=<service>)
 	$(COMPOSE) logs -f --tail=100 $(s)
