@@ -403,10 +403,6 @@ services:
     <<: *base
     container_name: flaresolverr
     image: ghcr.io/flaresolverr/flaresolverr:latest
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.flaresolverr.rule=Host(`flaresolverr.${DOMAIN}`)
-      - traefik.http.services.flaresolverr.loadbalancer.server.port=8191
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:8191/health"]

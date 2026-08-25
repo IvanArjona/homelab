@@ -50,7 +50,6 @@
         container: warp
     - FlareSolverr:
         icon: flaresolverr.png
-        href: https://flaresolverr.{{HOMEPAGE_VAR_DOMAIN}}
         description: Bypass Cloudflare protection
         server: docker
         container: flaresolverr
