@@ -272,6 +272,9 @@ services:
     <<: *base
     container_name: sonarr
     image: ghcr.io/linuxserver/sonarr:latest
+    depends_on:
+      jackett:
+        condition: service_healthy
     volumes:
       - ./sonarr:/config
       - *data
@@ -287,6 +290,9 @@ services:
     <<: *base
     container_name: radarr
     image: ghcr.io/linuxserver/radarr:latest
+    depends_on:
+      jackett:
+        condition: service_healthy
     volumes:
       - ./radarr:/config
       - *data
@@ -302,6 +308,11 @@ services:
     <<: *base
     container_name: recyclarr
     image: ghcr.io/recyclarr/recyclarr:8
+    depends_on:
+      sonarr:
+        condition: service_healthy
+      radarr:
+        condition: service_healthy
     environment:
       <<: *env
       SONARR_API_KEY: ${SONARR_API_KEY}
@@ -320,6 +331,11 @@ services:
     <<: *base
     container_name: bazarr
     image: ghcr.io/linuxserver/bazarr:latest
+    depends_on:
+      sonarr:
+        condition: service_healthy
+      radarr:
+        condition: service_healthy
     volumes:
       - ./bazarr:/config
       - *media
@@ -336,6 +352,11 @@ services:
     container_name: cleanuparr
     image: ghcr.io/cleanuparr/cleanuparr:latest
     user: root
+    depends_on:
+      sonarr:
+        condition: service_healthy
+      radarr:
+        condition: service_healthy
     volumes:
       - ./cleanuparr:/config
     labels:
