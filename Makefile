@@ -1,4 +1,4 @@
-.PHONY: up down restart pull logs status ps clean update setup backup help
+.PHONY: up down restart pull logs status ps clean update setup help
 
 COMPOSE = docker compose
 

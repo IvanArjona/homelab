@@ -42,7 +42,6 @@ make pull          # Pull latest images
 make update        # Pull latest changes (reset local modifications)
 make validate      # Validate compose file
 make clean         # Remove stopped containers and dangling images
-make backup        # Create a tarball of config directories
 make shell s=NAME  # Open a shell in a container
 make recreate s=N  # Force recreate a service
 ```
