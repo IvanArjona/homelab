@@ -114,6 +114,9 @@ services:
       WATCHTOWER_HTTP_API_METRICS: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "/watchtower", "--health-check"]
 
   homepage:
     <<: *base
@@ -165,6 +168,10 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1
     volumes:
       - ./warp:/etc/warp
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "--socks5-hostname", "127.0.0.1:1080", "https://cloudflare.com/cdn-cgi/trace"]
+      start_period: 30s
 
   pihole:
     <<: *base
@@ -304,6 +311,10 @@ services:
     security_opt: [no-new-privileges:true]
     volumes:
       - ./recyclarr:/config
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD-SHELL", "recyclarr --version"]
+      interval: 60s
 
   bazarr:
     <<: *base
@@ -461,6 +472,9 @@ services:
     tmpfs:
       - /tmp
     command: '-s "data;/data;;no" -s "home;/home;;no" -u "${SAMBA_USER};${SAMBA_PASSWORD}" -p -n -r'
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD-SHELL", "smbclient -L localhost -N || exit 1"]
 
   filebrowser:
     <<: *base
@@ -539,6 +553,9 @@ services:
       INFLUXDB_API_TOKEN: ${INFLUXDB_API_TOKEN}
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD-SHELL", "pgrep telegraf || exit 1"]
 
   grafana:
     <<: *base
