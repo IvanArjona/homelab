@@ -25,6 +25,10 @@ x-volumes:
   data: &data /data:/data
 
 services:
+  # ===========================================================================
+  # Networking (core - always started)
+  # ===========================================================================
+
   dockerproxy:
     <<: *base
     image: ghcr.io/tecnativa/docker-socket-proxy:latest
@@ -83,97 +87,6 @@ services:
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "traefik", "healthcheck", "--ping"]
-
-  cloudflareddns:
-    <<: *base
-    image: favonia/cloudflare-ddns:latest
-    container_name: cloudflareddns
-    read_only: true
-    cap_drop: [all]
-    security_opt: [no-new-privileges:true]
-    environment:
-      <<: *env
-      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_DNS_API_TOKEN}
-      DOMAINS: ${PUBLIC_DOMAIN}
-      PROXIED: false
-
-  watchtower:
-    <<: *base
-    image: nickfedor/watchtower:latest
-    container_name: watchtower
-    user: ${PUID}:${DOCKER_GUID}
-    depends_on:
-      dockerproxy:
-        condition: service_started
-    environment:
-      <<: *env
-      WATCHTOWER_POLL_INTERVAL: 10800
-      WATCHTOWER_CLEANUP: true
-      WATCHTOWER_TIMEOUT: 30s
-      WATCHTOWER_NO_STARTUP_MESSAGE: true
-      WATCHTOWER_NOTIFICATION_URL: ${WATCHTOWER_NOTIFICATION_URL}
-      WATCHTOWER_HTTP_API_TOKEN: ${WATCHTOWER_API_TOKEN}
-      WATCHTOWER_HTTP_API_METRICS: true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    healthcheck:
-      <<: *healthcheck
-      test: ["CMD", "/watchtower", "--health-check"]
-
-  homepage:
-    <<: *base
-    image: ghcr.io/gethomepage/homepage:latest
-    container_name: homepage
-    depends_on:
-      dockerproxy:
-        condition: service_healthy
-    volumes:
-      - ./homepage:/app/config
-    environment:
-      HOMEPAGE_ALLOWED_HOSTS: ${DOMAIN}
-      HOMEPAGE_VAR_DOMAIN: ${DOMAIN}
-      HOMEPAGE_VAR_PIHOLE_PASSWORD: ${PIHOLE_PASSWORD}
-      HOMEPAGE_VAR_WIREGUARD_USER: ${WIREGUARD_USER}
-      HOMEPAGE_VAR_WIREGUARD_PASSWORD: ${WIREGUARD_PASSWORD}
-      HOMEPAGE_VAR_JELLYFIN_API_KEY: ${JELLYFIN_API_KEY}
-      HOMEPAGE_VAR_SONARR_API_KEY: ${SONARR_API_KEY}
-      HOMEPAGE_VAR_RADARR_API_KEY: ${RADARR_API_KEY}
-      HOMEPAGE_VAR_SEERR_API_KEY: ${SEERR_API_KEY}
-      HOMEPAGE_VAR_BAZARR_API_KEY: ${BAZARR_API_KEY}
-      HOMEPAGE_VAR_JACKETT_PASSWORD: ${JACKETT_PASSWORD}
-      HOMEPAGE_VAR_QBITTORRENT_USERNAME: ${QBITTORRENT_USERNAME}
-      HOMEPAGE_VAR_QBITTORRENT_PASSWORD: ${QBITTORRENT_PASSWORD}
-      HOMEPAGE_VAR_CHANGEDETECTION_API_KEY: ${CHANGEDETECTION_API_KEY}
-      HOMEPAGE_VAR_WATCHTOWER_API_TOKEN: ${WATCHTOWER_API_TOKEN}
-      HOMEPAGE_VAR_GRAFANA_ADMIN_USER: ${GRAFANA_ADMIN_USER}
-      HOMEPAGE_VAR_GRAFANA_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.homepage.rule=Host(`${DOMAIN}`)
-      - traefik.http.services.homepage.loadbalancer.server.port=3000
-    healthcheck:
-      <<: *healthcheck
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
-
-  warp:
-    <<: *base
-    image: caomingjun/warp:latest
-    container_name: warp
-    device_cgroup_rules:
-      - "c 10:200 rwm"
-    cap_add:
-      - MKNOD
-      - AUDIT_WRITE
-      - NET_ADMIN
-    sysctls:
-      - net.ipv6.conf.all.disable_ipv6=0
-      - net.ipv4.conf.all.src_valid_mark=1
-    volumes:
-      - ./warp:/etc/warp
-    healthcheck:
-      <<: *healthcheck
-      test: ["CMD", "curl", "-f", "--socks5-hostname", "127.0.0.1:1080", "https://cloudflare.com/cdn-cgi/trace"]
-      start_period: 30s
 
   pihole:
     <<: *base
@@ -245,10 +158,63 @@ services:
       <<: *healthcheck
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://0.0.0.0:51821"]
 
+  # ===========================================================================
+  # Network Infrastructure
+  # ===========================================================================
+
+  cloudflareddns:
+    <<: *base
+    image: favonia/cloudflare-ddns:latest
+    container_name: cloudflareddns
+    profiles: [network-infrastructure]
+    read_only: true
+    cap_drop: [all]
+    security_opt: [no-new-privileges:true]
+    environment:
+      <<: *env
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_DNS_API_TOKEN}
+      DOMAINS: ${PUBLIC_DOMAIN}
+      PROXIED: false
+
+  warp:
+    <<: *base
+    image: caomingjun/warp:latest
+    container_name: warp
+    profiles: [network-infrastructure]
+    device_cgroup_rules:
+      - "c 10:200 rwm"
+    cap_add:
+      - MKNOD
+      - AUDIT_WRITE
+      - NET_ADMIN
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv4.conf.all.src_valid_mark=1
+    volumes:
+      - ./warp:/etc/warp
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "--socks5-hostname", "127.0.0.1:1080", "https://cloudflare.com/cdn-cgi/trace"]
+      start_period: 30s
+
+  flaresolverr:
+    <<: *base
+    container_name: flaresolverr
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    profiles: [network-infrastructure]
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:8191/health"]
+
+  # ===========================================================================
+  # Media
+  # ===========================================================================
+
   jellyfin:
     <<: *base
     container_name: jellyfin
     image: jellyfin/jellyfin:latest
+    profiles: [media]
     user: "${PUID}:${RENDER_GUID}"
     environment:
       <<: *env
@@ -274,6 +240,7 @@ services:
     <<: *base
     container_name: sonarr
     image: ghcr.io/linuxserver/sonarr:latest
+    profiles: [media]
     depends_on:
       jackett:
         condition: service_healthy
@@ -292,6 +259,7 @@ services:
     <<: *base
     container_name: radarr
     image: ghcr.io/linuxserver/radarr:latest
+    profiles: [media]
     depends_on:
       jackett:
         condition: service_healthy
@@ -306,10 +274,48 @@ services:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:7878/ping"]
 
+  seerr:
+    <<: *base
+    container_name: seerr
+    image: ghcr.io/seerr-team/seerr:latest
+    profiles: [media]
+    init: true
+    volumes:
+      - ./seerr:/app/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.seerr.rule=Host(`seerr.${DOMAIN}`)
+      - traefik.http.services.seerr.loadbalancer.server.port=5055
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5055/api/v1/status"]
+
+  bazarr:
+    <<: *base
+    container_name: bazarr
+    image: ghcr.io/linuxserver/bazarr:latest
+    profiles: [media]
+    depends_on:
+      sonarr:
+        condition: service_healthy
+      radarr:
+        condition: service_healthy
+    volumes:
+      - ./bazarr:/config
+      - *media
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.bazarr.rule=Host(`bazarr.${DOMAIN}`)
+      - traefik.http.services.bazarr.loadbalancer.server.port=6767
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:6767/ping"]
+
   recyclarr:
     <<: *base
     container_name: recyclarr
     image: ghcr.io/recyclarr/recyclarr:8
+    profiles: [media]
     depends_on:
       sonarr:
         condition: service_healthy
@@ -329,30 +335,11 @@ services:
       test: ["CMD-SHELL", "recyclarr --version"]
       interval: 60s
 
-  bazarr:
-    <<: *base
-    container_name: bazarr
-    image: ghcr.io/linuxserver/bazarr:latest
-    depends_on:
-      sonarr:
-        condition: service_healthy
-      radarr:
-        condition: service_healthy
-    volumes:
-      - ./bazarr:/config
-      - *media
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.bazarr.rule=Host(`bazarr.${DOMAIN}`)
-      - traefik.http.services.bazarr.loadbalancer.server.port=6767
-    healthcheck:
-      <<: *healthcheck
-      test: ["CMD", "curl", "-f", "http://localhost:6767/ping"]
-
   cleanuparr:
     <<: *base
     container_name: cleanuparr
     image: ghcr.io/cleanuparr/cleanuparr:latest
+    profiles: [media]
     user: root
     depends_on:
       sonarr:
@@ -369,25 +356,15 @@ services:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:11011"]
 
-  seerr:
-    <<: *base
-    container_name: seerr
-    image: ghcr.io/seerr-team/seerr:latest
-    init: true
-    volumes:
-      - ./seerr:/app/config
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.seerr.rule=Host(`seerr.${DOMAIN}`)
-      - traefik.http.services.seerr.loadbalancer.server.port=5055
-    healthcheck:
-      <<: *healthcheck
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5055/api/v1/status"]
+  # ===========================================================================
+  # Downloads
+  # ===========================================================================
 
   jackett:
     <<: *base
     container_name: jackett
     image: ghcr.io/linuxserver/jackett:latest
+    profiles: [downloads]
     volumes:
       - ./jackett:/config
       - *torrents
@@ -399,18 +376,11 @@ services:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:9117/UI/Dashboard"]
 
-  flaresolverr:
-    <<: *base
-    container_name: flaresolverr
-    image: ghcr.io/flaresolverr/flaresolverr:latest
-    healthcheck:
-      <<: *healthcheck
-      test: ["CMD", "curl", "-f", "http://localhost:8191/health"]
-
   qbittorrent:
     <<: *base
     container_name: qbittorrent
     image: ghcr.io/linuxserver/qbittorrent:latest
+    profiles: [downloads]
     ports:
       - 6881:6881/tcp
       - 6881:6881/udp
@@ -426,10 +396,15 @@ services:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:8080"]
 
+  # ===========================================================================
+  # Automation
+  # ===========================================================================
+
   browserless:
     <<: *base
     container_name: browserless
     image: ghcr.io/browserless/chromium:latest
+    profiles: [automation]
     user: root
     shm_size: 2gb
     environment:
@@ -451,6 +426,7 @@ services:
     <<: *base
     container_name: changedetection
     image: ghcr.io/dgtlmoon/changedetection.io:latest
+    profiles: [automation]
     environment:
       <<: *env
       BASE_URL: https://changedetection.${DOMAIN}
@@ -471,10 +447,42 @@ services:
       test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000')"]
       start_period: 30s
 
+  n8n:
+    <<: *base
+    container_name: n8n
+    image: docker.n8n.io/n8nio/n8n:latest
+    profiles: [automation]
+    user: node:${DOCKER_GUID}
+    environment:
+      <<: *env
+      N8N_HOST: n8n.${DOMAIN}
+      N8N_PROTOCOL: https
+      N8N_RUNNERS_ENABLED: true
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: false
+      WEBHOOK_URL: https://n8n.${DOMAIN}/
+      GENERIC_TIMEZONE: ${TZ}
+      NODES_EXCLUDE: "[]"
+    ports:
+      - 5678:5678
+    volumes:
+      - ./n8n:/home/node/.n8n
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.n8n.rule=Host(`n8n.${DOMAIN}`)
+      - traefik.http.services.n8n.loadbalancer.server.port=5678
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5678/healthz"]
+
+  # ===========================================================================
+  # Storage & Backups
+  # ===========================================================================
+
   samba:
     <<: *base
     container_name: samba
     image: dperson/samba:latest
+    profiles: [storage]
     user: root
     ports:
       - 137:137/udp
@@ -499,6 +507,7 @@ services:
     <<: *base
     container_name: filebrowser
     image: gtstef/filebrowser:latest
+    profiles: [storage]
     environment:
       <<: *env
       FILEBROWSER_CONFIG: data/config.yaml
@@ -515,36 +524,87 @@ services:
       <<: *healthcheck
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/health"]
 
-  n8n:
+  duplicati:
     <<: *base
-    container_name: n8n
-    image: docker.n8n.io/n8nio/n8n:latest
-    user: node:${DOCKER_GUID}
+    container_name: duplicati
+    image: lscr.io/linuxserver/duplicati:latest
+    profiles: [storage]
+    user: root
     environment:
       <<: *env
-      N8N_HOST: n8n.${DOMAIN}
-      N8N_PROTOCOL: https
-      N8N_RUNNERS_ENABLED: true
-      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: false
-      WEBHOOK_URL: https://n8n.${DOMAIN}/
-      GENERIC_TIMEZONE: ${TZ}
-      NODES_EXCLUDE: "[]"
-    ports:
-      - 5678:5678
+      SETTINGS_ENCRYPTION_KEY: ${DUPLICATI_ENCRYPTION_KEY}
+      DUPLICATI__WEBSERVICE_PASSWORD: ${DUPLICATI_PASSWORD}
     volumes:
-      - ./n8n:/home/node/.n8n
+      - ./duplicati/config:/config
+      - ./:/homelab:z
+    ports:
+      - 8200:8200
     labels:
       - traefik.enable=true
-      - traefik.http.routers.n8n.rule=Host(`n8n.${DOMAIN}`)
-      - traefik.http.services.n8n.loadbalancer.server.port=5678
+      - traefik.http.routers.duplicati.rule=Host(`duplicati.${DOMAIN}`)
+      - traefik.http.services.duplicati.loadbalancer.server.port=8200
     healthcheck:
       <<: *healthcheck
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5678/healthz"]
+      test: ["CMD", "curl", "-f", "http://localhost:8200"]
+
+  # ===========================================================================
+  # Container Management
+  # ===========================================================================
+
+  watchtower:
+    <<: *base
+    image: nickfedor/watchtower:latest
+    container_name: watchtower
+    profiles: [container-management]
+    user: ${PUID}:${DOCKER_GUID}
+    depends_on:
+      dockerproxy:
+        condition: service_started
+    environment:
+      <<: *env
+      WATCHTOWER_POLL_INTERVAL: 10800
+      WATCHTOWER_CLEANUP: true
+      WATCHTOWER_TIMEOUT: 30s
+      WATCHTOWER_NO_STARTUP_MESSAGE: true
+      WATCHTOWER_NOTIFICATION_URL: ${WATCHTOWER_NOTIFICATION_URL}
+      WATCHTOWER_HTTP_API_TOKEN: ${WATCHTOWER_API_TOKEN}
+      WATCHTOWER_HTTP_API_METRICS: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "/watchtower", "--health-check"]
+
+  dockge:
+    <<: *base
+    container_name: dockge
+    image: louislam/dockge:1
+    profiles: [container-management]
+    user: root
+    environment:
+      <<: *env
+      DOCKGE_STACKS_DIR: /opt/stacks
+    volumes:
+      - ./dockge:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ..:/opt/stacks
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dockge.rule=Host(`dockge.${DOMAIN}`)
+      - traefik.http.services.dockge.loadbalancer.server.port=5001
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "node", "-e", "const http=require('http');const r=http.get('http://localhost:5001',res=>{process.exit(res.statusCode===200?0:1)});r.on('error',()=>process.exit(1))"]
+
+  # ===========================================================================
+  # Monitoring
+  # ===========================================================================
 
   influxdb:
     <<: *base
     container_name: influxdb
     image: influxdb:latest
+    profiles: [monitoring]
     volumes:
       - ./influxdb:/var/lib/influxdb2
     labels:
@@ -559,6 +619,7 @@ services:
     <<: *base
     container_name: telegraf
     image: telegraf:latest
+    profiles: [monitoring]
     user: telegraf:${DOCKER_GUID}
     depends_on:
       influxdb:
@@ -580,6 +641,7 @@ services:
     <<: *base
     container_name: grafana
     image: grafana/grafana:latest
+    profiles: [monitoring]
     depends_on:
       influxdb:
         condition: service_healthy
@@ -597,47 +659,44 @@ services:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
 
-  dockge:
-    <<: *base
-    container_name: dockge
-    image: louislam/dockge:1
-    user: root
-    environment:
-      <<: *env
-      DOCKGE_STACKS_DIR: /opt/stacks
-    volumes:
-      - ./dockge:/app/data
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ..:/opt/stacks
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.dockge.rule=Host(`dockge.${DOMAIN}`)
-      - traefik.http.services.dockge.loadbalancer.server.port=5001
-    healthcheck:
-      <<: *healthcheck
-      test: ["CMD", "node", "-e", "const http=require('http');const r=http.get('http://localhost:5001',res=>{process.exit(res.statusCode===200?0:1)});r.on('error',()=>process.exit(1))"]
+  # ===========================================================================
+  # Homepage (core - always started)
+  # ===========================================================================
 
-  duplicati:
+  homepage:
     <<: *base
-    container_name: duplicati
-    image: lscr.io/linuxserver/duplicati:latest
-    user: root
-    environment:
-      <<: *env
-      SETTINGS_ENCRYPTION_KEY: ${DUPLICATI_ENCRYPTION_KEY}
-      DUPLICATI__WEBSERVICE_PASSWORD: ${DUPLICATI_PASSWORD}
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    depends_on:
+      dockerproxy:
+        condition: service_healthy
     volumes:
-      - ./duplicati/config:/config
-      - ./:/homelab:z
-    ports:
-      - 8200:8200
+      - ./homepage:/app/config
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: ${DOMAIN}
+      HOMEPAGE_VAR_DOMAIN: ${DOMAIN}
+      HOMEPAGE_VAR_PIHOLE_PASSWORD: ${PIHOLE_PASSWORD}
+      HOMEPAGE_VAR_WIREGUARD_USER: ${WIREGUARD_USER}
+      HOMEPAGE_VAR_WIREGUARD_PASSWORD: ${WIREGUARD_PASSWORD}
+      HOMEPAGE_VAR_JELLYFIN_API_KEY: ${JELLYFIN_API_KEY}
+      HOMEPAGE_VAR_SONARR_API_KEY: ${SONARR_API_KEY}
+      HOMEPAGE_VAR_RADARR_API_KEY: ${RADARR_API_KEY}
+      HOMEPAGE_VAR_SEERR_API_KEY: ${SEERR_API_KEY}
+      HOMEPAGE_VAR_BAZARR_API_KEY: ${BAZARR_API_KEY}
+      HOMEPAGE_VAR_JACKETT_PASSWORD: ${JACKETT_PASSWORD}
+      HOMEPAGE_VAR_QBITTORRENT_USERNAME: ${QBITTORRENT_USERNAME}
+      HOMEPAGE_VAR_QBITTORRENT_PASSWORD: ${QBITTORRENT_PASSWORD}
+      HOMEPAGE_VAR_CHANGEDETECTION_API_KEY: ${CHANGEDETECTION_API_KEY}
+      HOMEPAGE_VAR_WATCHTOWER_API_TOKEN: ${WATCHTOWER_API_TOKEN}
+      HOMEPAGE_VAR_GRAFANA_ADMIN_USER: ${GRAFANA_ADMIN_USER}
+      HOMEPAGE_VAR_GRAFANA_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
     labels:
       - traefik.enable=true
-      - traefik.http.routers.duplicati.rule=Host(`duplicati.${DOMAIN}`)
-      - traefik.http.services.duplicati.loadbalancer.server.port=8200
+      - traefik.http.routers.homepage.rule=Host(`${DOMAIN}`)
+      - traefik.http.services.homepage.loadbalancer.server.port=3000
     healthcheck:
       <<: *healthcheck
-      test: ["CMD", "curl", "-f", "http://localhost:8200"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
 
 volumes:
   letsencrypt:
