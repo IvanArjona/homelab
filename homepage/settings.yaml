@@ -4,10 +4,10 @@ layout:
   Media:
     style: row
     columns: 4
+  Downloads:
   Automation:
-  Download:
-  Management:
-  Finance:
+  Storage & Backups:
+  Container Management:
   Networking:
-  Networking tools:
+  Network Infrastructure:
   Monitoring:

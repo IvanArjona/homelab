@@ -32,7 +32,7 @@
           username: "{{HOMEPAGE_VAR_WIREGUARD_USER}}"
           password: "{{HOMEPAGE_VAR_WIREGUARD_PASSWORD}}"
 
-- Networking tools:
+- Network Infrastructure:
     - Docker Proxy:
         icon: docker.png
         description: Docker socket proxy for Traefik
@@ -100,30 +100,33 @@
           type: seerr
           url: http://seerr:5055
           key: "{{HOMEPAGE_VAR_SEERR_API_KEY}}"
-
-- Download:
-    - Recyclarr:
-        icon: recyclarr.png
-        description: Sonarr and Radarr custom formats manager
-        server: docker
-        container: recyclarr
     - Bazarr:
         icon: bazarr.png
         href: https://bazarr.{{HOMEPAGE_VAR_DOMAIN}}
         description: Subtitle manager
+        weight: 3
         server: docker
         container: bazarr
         widget:
           type: bazarr
           url: http://bazarr:6767
           key: "{{HOMEPAGE_VAR_BAZARR_API_KEY}}"
+    - Recyclarr:
+        icon: recyclarr.png
+        description: Sonarr and Radarr custom formats manager
+        weight: 4
+        server: docker
+        container: recyclarr
     - Cleanuparr:
         icon: cleanuperr.png
         href: https://cleanuparr.{{HOMEPAGE_VAR_DOMAIN}}
         description: Media cleanup tool
+        weight: 4
         server: docker
         container: cleanuparr
         ping: http://cleanuparr:11011
+
+- Downloads:
     - Jackett:
         icon: jackett.png
         href: https://jackett.{{HOMEPAGE_VAR_DOMAIN}}
@@ -173,23 +176,7 @@
         server: docker
         container: browserless
 
-- Management:
-    - Dockge:
-        icon: dockge.png
-        href: https://dockge.{{HOMEPAGE_VAR_DOMAIN}}
-        description: Docker compose stack manager
-        server: docker
-        container: dockge
-        ping: http://dockge:5001
-    - Watchtower:
-        icon: watchtower.png
-        description: Automatic Docker container updater
-        server: docker
-        container: watchtower
-        widget:
-          type: watchtower
-          url: http://watchtower:8080
-          key: "{{HOMEPAGE_VAR_WATCHTOWER_API_TOKEN}}"
+- Storage & Backups:
     - Samba:
         icon: samba-server.png
         description: File sharing service
@@ -209,6 +196,24 @@
         server: docker
         container: duplicati
         ping: http://duplicati:8200
+
+- Container Management:
+    - Dockge:
+        icon: dockge.png
+        href: https://dockge.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Docker compose stack manager
+        server: docker
+        container: dockge
+        ping: http://dockge:5001
+    - Watchtower:
+        icon: watchtower.png
+        description: Automatic Docker container updater
+        server: docker
+        container: watchtower
+        widget:
+          type: watchtower
+          url: http://watchtower:8080
+          key: "{{HOMEPAGE_VAR_WATCHTOWER_API_TOKEN}}"
 
 - Monitoring:
     - InfluxDB:
