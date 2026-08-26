@@ -222,28 +222,4 @@
           url: http://watchtower:8080
           key: "{{HOMEPAGE_VAR_WATCHTOWER_API_TOKEN}}"
 
-- Monitoring:
-    - InfluxDB:
-        icon: influxdb.png
-        href: https://influxdb.{{HOMEPAGE_VAR_DOMAIN}}
-        description: Time series database
-        server: docker
-        container: influxdb
-        ping: http://influxdb:8086
-    - Telegraf:
-        icon: telegraf.png
-        description: Metrics collector
-        server: docker
-        container: telegraf
-    - Grafana:
-        icon: grafana.png
-        href: https://grafana.{{HOMEPAGE_VAR_DOMAIN}}/
-        description: Visualization tool
-        server: docker
-        container: grafana
-        widget:
-          type: grafana
-          version: 2
-          url: http://grafana:3000
-          username: "{{HOMEPAGE_VAR_GRAFANA_ADMIN_USER}}"
-          password: "{{HOMEPAGE_VAR_GRAFANA_ADMIN_PASSWORD}}"
+

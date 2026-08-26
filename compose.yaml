@@ -617,68 +617,7 @@ services:
       <<: *healthcheck
       test: ["CMD", "node", "-e", "const http=require('http');const r=http.get('http://localhost:5001',res=>{process.exit(res.statusCode===200?0:1)});r.on('error',()=>process.exit(1))"]
 
-  # ===========================================================================
-  # Monitoring
-  # ===========================================================================
 
-  influxdb:
-    <<: *base
-    container_name: influxdb
-    image: influxdb:latest
-    profiles: [monitoring]
-    volumes:
-      - ./influxdb:/var/lib/influxdb2
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.influxdb.rule=Host(`influxdb.${DOMAIN}`)
-      - traefik.http.services.influxdb.loadbalancer.server.port=8086
-    healthcheck:
-      <<: *healthcheck
-      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
-
-  telegraf:
-    <<: *base
-    container_name: telegraf
-    image: telegraf:latest
-    profiles: [monitoring]
-    user: telegraf:${DOCKER_GUID}
-    depends_on:
-      influxdb:
-        condition: service_healthy
-      dockerproxy:
-        condition: service_healthy
-    environment:
-      <<: *env
-      INFLUXDB_ORGANIZATION: ${INFLUXDB_ORGANIZATION}
-      INFLUXDB_BUCKET: ${INFLUXDB_BUCKET}
-      INFLUXDB_API_TOKEN: ${INFLUXDB_API_TOKEN}
-    volumes:
-      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-    healthcheck:
-      <<: *healthcheck
-      test: ["CMD-SHELL", "pgrep telegraf || exit 1"]
-
-  grafana:
-    <<: *base
-    container_name: grafana
-    image: grafana/grafana:latest
-    profiles: [monitoring]
-    depends_on:
-      influxdb:
-        condition: service_healthy
-    environment:
-      <<: *env
-      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER}
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
-    volumes:
-      - ./grafana:/var/lib/grafana
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)
-      - traefik.http.services.grafana.loadbalancer.server.port=3000
-    healthcheck:
-      <<: *healthcheck
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
 
   # ===========================================================================
   # Homepage (core - always started)
@@ -709,8 +648,6 @@ services:
       HOMEPAGE_VAR_QBITTORRENT_PASSWORD: ${QBITTORRENT_PASSWORD}
       HOMEPAGE_VAR_CHANGEDETECTION_API_KEY: ${CHANGEDETECTION_API_KEY}
       HOMEPAGE_VAR_WATCHTOWER_API_TOKEN: ${WATCHTOWER_API_TOKEN}
-      HOMEPAGE_VAR_GRAFANA_ADMIN_USER: ${GRAFANA_ADMIN_USER}
-      HOMEPAGE_VAR_GRAFANA_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
     labels:
       - traefik.enable=true
       - traefik.http.routers.homepage.rule=Host(`${DOMAIN}`)
