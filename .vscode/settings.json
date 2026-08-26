@@ -1,0 +1,29 @@
+{
+  "terminal.integrated.profiles.osx": {
+    "ssh": {
+      "path": "/usr/bin/make",
+      "args": ["ssh"],
+      "icon": "remote",
+      "color": "terminal.ansiGreen",
+      "overrideName": true
+    }
+  },
+  "terminal.integrated.profiles.linux": {
+    "ssh": {
+      "path": "/usr/bin/make",
+      "args": ["ssh"],
+      "icon": "remote",
+      "color": "terminal.ansiGreen",
+      "overrideName": true
+    }
+  },
+  "terminal.integrated.profiles.windows": {
+    "ssh": {
+      "path": "cmd.exe",
+      "args": ["/c", "make", "ssh"],
+      "icon": "remote",
+      "color": "terminal.ansiGreen",
+      "overrideName": true
+    }
+  }
+}
