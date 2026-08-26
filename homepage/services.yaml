@@ -207,7 +207,8 @@
         widget:
           type: portainer
           url: https://portainer:9443
-          env: 1
+          env: 3
+          key: "{{HOMEPAGE_VAR_PORTAINER_API_KEY}}"
     - Dozzle:
         icon: dozzle.png
         href: https://dozzle.{{HOMEPAGE_VAR_DOMAIN}}
