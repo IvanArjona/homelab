@@ -631,6 +631,19 @@ services:
       <<: *healthcheck
       test: ["CMD", "node", "-e", "const http=require('http');const r=http.get('http://localhost:5001',res=>{process.exit(res.statusCode===200?0:1)});r.on('error',()=>process.exit(1))"]
 
+  portainer:
+    <<: *base
+    container_name: portainer
+    image: portainer/portainer-ce:lts
+    profiles: [container-management]
+    user: ""
+    volumes:
+      - ./portainer:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
 
 
   # ===========================================================================
