@@ -434,6 +434,9 @@ services:
       BASE_URL: https://changedetection.${DOMAIN}
       DISABLE_VERSION_CHECK: true
       PLAYWRIGHT_DRIVER_URL: ${PLAYWRIGHT_DRIVER_URL}
+      FETCH_WORKERS: 2
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
     volumes:
       - ./changedetection/config:/config
       - ./changedetection/datastore:/datastore
@@ -446,7 +449,7 @@ services:
       - traefik.http.services.changedetection.loadbalancer.server.port=5000
     healthcheck:
       <<: *healthcheck
-      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000')"]
+      test: ["CMD", "python3", "-c", "import socket; s=socket.create_connection(('localhost',5000),2); s.close()"]
       start_period: 30s
 
   n8n:
