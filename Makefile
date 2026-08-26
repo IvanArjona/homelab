@@ -1,6 +1,11 @@
-.PHONY: up down restart pull recreate logs status ps clean update setup help
+.PHONY: up down restart pull recreate logs status ps clean update setup deploy sync ssh help
+
+include .env
 
 COMPOSE = docker compose
+SERVER_PATH ?= ~/homelab
+SSH_TARGET = $(USER)@$(PUBLIC_DOMAIN)
+remote = ssh $(SSH_TARGET) "cd $(SERVER_PATH) && $(1)"
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -47,3 +52,12 @@ update: ## Pull latest changes (reset local modifications)
 
 validate: ## Validate compose file
 	$(COMPOSE) config --quiet && echo "compose.yaml is valid"
+
+ssh: ## Open an SSH session to the server
+	ssh -t $(SSH_TARGET) "cd $(SERVER_PATH) && exec \$$SHELL -l"
+
+sync: ## Sync changes to server for testing
+	git ls-files --cached --modified --others --exclude-standard | sort -u | rsync -avz --files-from=- ./ $(SSH_TARGET):$(SERVER_PATH)/
+
+deploy: sync ## Deploy to server via sync and restart
+	$(call remote,make up)

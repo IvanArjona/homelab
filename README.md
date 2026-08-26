@@ -46,6 +46,18 @@ make shell s=NAME  # Open a shell in a container
 make recreate s=N  # Force recreate a service
 ```
 
+## Deployment
+
+```bash
+make deploy        # Sync files to server and run make up
+make sync          # Sync files to server without restarting
+make ssh           # Open an SSH session to the server
+```
+
+`deploy` syncs all git-tracked and modified files to the server via rsync, then runs `make up` remotely. Use `sync` alone if you just want to push files without restarting services.
+
+The server connection is configured via `USER` and `PUBLIC_DOMAIN` in your `.env` file.
+
 ## Post-startup
 
 Some services generate API keys on first run. After starting, grab the keys from each service's UI and update your `.env` file, then restart:
