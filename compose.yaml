@@ -219,11 +219,14 @@ services:
     environment:
       <<: *env
       JELLYFIN_PublishedServerUrl: https://jellyfin.${DOMAIN}
+      JELLYFIN_CACHE_DIR: /cache
+      DOTNET_BUNDLE_EXTRACT_BASE_DIR: /cache/.net
     ports:
       - 7359:7359/udp
       - 1900:1900/udp
     volumes:
       - ./jellyfin:/config
+      - jellyfin-cache:/cache
       - *media
     devices:
       - /dev/dri:/dev/dri
@@ -663,6 +666,7 @@ services:
 
 volumes:
   letsencrypt:
+  jellyfin-cache:
 
 networks:
   homelab:
