@@ -413,6 +413,7 @@ services:
       TIMEOUT: 60000
       CORS: true
       CONCURRENT: 10
+      METRICS_JSON_PATH: /dev/null
     labels:
       - traefik.enable=true
       - traefik.http.routers.browserless.rule=Host(`browserless.${DOMAIN}`)
