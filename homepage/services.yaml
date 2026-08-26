@@ -198,17 +198,6 @@
         ping: http://duplicati:8200
 
 - Container Management:
-    - Portainer:
-        icon: portainer.png
-        href: https://portainer.{{HOMEPAGE_VAR_DOMAIN}}
-        description: Docker management UI
-        server: docker
-        container: portainer
-        widget:
-          type: portainer
-          url: https://portainer:9443
-          env: 3
-          key: "{{HOMEPAGE_VAR_PORTAINER_API_KEY}}"
     - Dozzle:
         icon: dozzle.png
         href: https://dozzle.{{HOMEPAGE_VAR_DOMAIN}}
