@@ -414,6 +414,7 @@ services:
       CORS: true
       CONCURRENT: 10
       METRICS_JSON_PATH: /dev/null
+      HEALTH: false
     labels:
       - traefik.enable=true
       - traefik.http.routers.browserless.rule=Host(`browserless.${DOMAIN}`)
