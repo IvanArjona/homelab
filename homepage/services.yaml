@@ -198,6 +198,13 @@
         ping: http://duplicati:8200
 
 - Container Management:
+    - Dozzle:
+        icon: dozzle.png
+        href: https://dozzle.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Real-time Docker log viewer
+        server: docker
+        container: dozzle
+        ping: http://dozzle:8080
     - Dockge:
         icon: dockge.png
         href: https://dockge.{{HOMEPAGE_VAR_DOMAIN}}

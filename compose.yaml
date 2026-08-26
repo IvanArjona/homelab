@@ -575,6 +575,27 @@ services:
       <<: *healthcheck
       test: ["CMD", "/watchtower", "--health-check"]
 
+  dozzle:
+    <<: *base
+    container_name: dozzle
+    image: amir20/dozzle:latest
+    profiles: [container-management]
+    user: ${PUID}:${DOCKER_GUID}
+    environment:
+      <<: *env
+      DOZZLE_ENABLE_ACTIONS: true
+      DOZZLE_ENABLE_SHELL: true
+      DOZZLE_NO_ANALYTICS: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dozzle.rule=Host(`dozzle.${DOMAIN}`)
+      - traefik.http.services.dozzle.loadbalancer.server.port=8080
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "/dozzle", "healthcheck"]
+
   dockge:
     <<: *base
     container_name: dockge
