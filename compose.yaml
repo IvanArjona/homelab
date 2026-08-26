@@ -101,13 +101,14 @@ services:
       FTLCONF_webserver_api_password: ${PIHOLE_PASSWORD}
       FTLCONF_dns_listeningMode: all
       FTLCONF_dns_upstreams: 1.1.1.1;1.0.0.1
+      FTLCONF_database_maxDBdays: 90
+      FTLCONF_dns_rateLimit: 1000/60
       PIHOLE_UID: ${PUID}
       PIHOLE_GID: ${GUID}
     volumes:
       - ./pihole:/etc/pihole
     cap_add:
       - NET_ADMIN
-      - SYS_TIME
       - SYS_NICE
     dns:
       - 1.1.1.1
@@ -465,9 +466,14 @@ services:
       <<: *env
       N8N_HOST: n8n.${DOMAIN}
       N8N_PROTOCOL: https
-      N8N_RUNNERS_ENABLED: true
       N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: false
-      WEBHOOK_URL: https://n8n.${DOMAIN}/
+      N8N_WEBHOOK_URL: https://n8n.${DOMAIN}/
+      N8N_TRUST_PROXY: true
+      N8N_MIGRATE_FS_STORAGE_PATH: true
+      N8N_UNVERIFIED_PACKAGES_ENABLED: true
+      N8N_RUNNERS_TASK_TIMEOUT: 300
+      N8N_COMPRESSION_NODE_MAX_DECOMPRESSED_SIZE_BYTES: 2147483648
+      N8N_COMPRESSION_NODE_MAX_ZIP_ENTRIES: 5000
       GENERIC_TIMEZONE: ${TZ}
       NODES_EXCLUDE: "[]"
     ports:
