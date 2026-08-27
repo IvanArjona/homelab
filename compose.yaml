@@ -54,17 +54,21 @@ services:
     depends_on:
       dockerproxy:
         condition: service_healthy
+      authelia:
+        condition: service_healthy
     command:
       - --api.insecure=true
       - --ping=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --providers.docker.endpoint=tcp://dockerproxy:2375
+      - --providers.file.filename=/etc/traefik/dynamic.yml
       - --entryPoints.web.address=:80
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
       - --entryPoints.websecure.address=:443
       - --entrypoints.websecure.http.tls.certresolver=resolver
+      - --entrypoints.websecure.http.middlewares=authelia@file
       - --entrypoints.websecure.asDefault=true
       - --certificatesresolvers.resolver.acme.dnschallenge=true
       - --certificatesresolvers.resolver.acme.dnschallenge.provider=cloudflare
@@ -75,18 +79,41 @@ services:
     environment:
       <<: *env
       CF_DNS_API_TOKEN: ${CLOUDFLARE_DNS_API_TOKEN}
+      DOMAIN: ${DOMAIN}
     ports:
       - 80:80
       - 443:443
     volumes:
       - letsencrypt:/letsencrypt
+      - ./traefik:/etc/traefik:ro
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
-      - traefik.http.services.traefik.loadbalancer.server.port=8080
+      traefik.enable: "true"
+      traefik.http.routers.traefik.rule: Host(`traefik.${DOMAIN}`)
+      traefik.http.services.traefik.loadbalancer.server.port: "8080"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "traefik", "healthcheck", "--ping"]
+
+  authelia:
+    <<: *base
+    image: authelia/authelia:latest
+    container_name: authelia
+    user: root
+    environment:
+      <<: *env
+      AUTHELIA_SESSION_SECRET: ${AUTHELIA_SESSION_SECRET}
+      AUTHELIA_STORAGE_ENCRYPTION_KEY: ${AUTHELIA_STORAGE_ENCRYPTION_KEY}
+      AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET: ${AUTHELIA_JWT_SECRET}
+      DOMAIN: ${DOMAIN}
+      X_AUTHELIA_CONFIG_FILTERS: template
+    volumes:
+      - ./authelia:/config
+    labels:
+      traefik.enable: "true"
+      traefik.http.services.authelia.loadbalancer.server.port: "9091"
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9091/api/health"]
 
   pihole:
     <<: *base
@@ -117,9 +144,9 @@ services:
       homelab:
         ipv4_address: ${PIHOLE_IP}
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.pihole.rule=Host(`pihole.${DOMAIN}`)
-      - traefik.http.services.pihole.loadbalancer.server.port=80
+      traefik.enable: "true"
+      traefik.http.routers.pihole.rule: Host(`pihole.${DOMAIN}`)
+      traefik.http.services.pihole.loadbalancer.server.port: "80"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "dig", "+short", "+time=2", "+tries=1", "@127.0.0.1", "healthcheck.pi-hole.net"]
@@ -152,9 +179,9 @@ services:
       - ./wireguard:/etc/wireguard
       - /lib/modules:/lib/modules:ro
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.wireguard.rule=Host(`wireguard.${DOMAIN}`)
-      - traefik.http.services.wireguard.loadbalancer.server.port=51821
+      traefik.enable: "true"
+      traefik.http.routers.wireguard.rule: Host(`wireguard.${DOMAIN}`)
+      traefik.http.services.wireguard.loadbalancer.server.port: "51821"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://0.0.0.0:51821"]
@@ -232,9 +259,9 @@ services:
     devices:
       - /dev/dri:/dev/dri
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.jellyfin.rule=Host(`jellyfin.${DOMAIN}`)
-      - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+      traefik.enable: "true"
+      traefik.http.routers.jellyfin.rule: Host(`jellyfin.${DOMAIN}`)
+      traefik.http.services.jellyfin.loadbalancer.server.port: "8096"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
@@ -252,9 +279,9 @@ services:
       - ./sonarr:/config
       - *data
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.sonarr.rule=Host(`sonarr.${DOMAIN}`)
-      - traefik.http.services.sonarr.loadbalancer.server.port=8989
+      traefik.enable: "true"
+      traefik.http.routers.sonarr.rule: Host(`sonarr.${DOMAIN}`)
+      traefik.http.services.sonarr.loadbalancer.server.port: "8989"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:8989/ping"]
@@ -271,9 +298,9 @@ services:
       - ./radarr:/config
       - *data
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.radarr.rule=Host(`radarr.${DOMAIN}`)
-      - traefik.http.services.radarr.loadbalancer.server.port=7878
+      traefik.enable: "true"
+      traefik.http.routers.radarr.rule: Host(`radarr.${DOMAIN}`)
+      traefik.http.services.radarr.loadbalancer.server.port: "7878"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:7878/ping"]
@@ -287,9 +314,9 @@ services:
     volumes:
       - ./seerr:/app/config
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.seerr.rule=Host(`seerr.${DOMAIN}`)
-      - traefik.http.services.seerr.loadbalancer.server.port=5055
+      traefik.enable: "true"
+      traefik.http.routers.seerr.rule: Host(`seerr.${DOMAIN}`)
+      traefik.http.services.seerr.loadbalancer.server.port: "5055"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:5055/api/v1/status"]
@@ -308,9 +335,9 @@ services:
       - ./bazarr:/config
       - *media
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.bazarr.rule=Host(`bazarr.${DOMAIN}`)
-      - traefik.http.services.bazarr.loadbalancer.server.port=6767
+      traefik.enable: "true"
+      traefik.http.routers.bazarr.rule: Host(`bazarr.${DOMAIN}`)
+      traefik.http.services.bazarr.loadbalancer.server.port: "6767"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:6767/ping"]
@@ -353,9 +380,9 @@ services:
     volumes:
       - ./cleanuparr:/config
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.cleanuparr.rule=Host(`cleanuparr.${DOMAIN}`)
-      - traefik.http.services.cleanuparr.loadbalancer.server.port=11011
+      traefik.enable: "true"
+      traefik.http.routers.cleanuparr.rule: Host(`cleanuparr.${DOMAIN}`)
+      traefik.http.services.cleanuparr.loadbalancer.server.port: "11011"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:11011"]
@@ -373,9 +400,9 @@ services:
       - ./jackett:/config
       - *torrents
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.jackett.rule=Host(`jackett.${DOMAIN}`)
-      - traefik.http.services.jackett.loadbalancer.server.port=9117
+      traefik.enable: "true"
+      traefik.http.routers.jackett.rule: Host(`jackett.${DOMAIN}`)
+      traefik.http.services.jackett.loadbalancer.server.port: "9117"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:9117/UI/Dashboard"]
@@ -393,9 +420,9 @@ services:
       - *torrents
       - *media
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${DOMAIN}`)
-      - traefik.http.services.qbittorrent.loadbalancer.server.port=8080
+      traefik.enable: "true"
+      traefik.http.routers.qbittorrent.rule: Host(`qbittorrent.${DOMAIN}`)
+      traefik.http.services.qbittorrent.loadbalancer.server.port: "8080"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:8080"]
@@ -420,9 +447,9 @@ services:
       METRICS_JSON_PATH: /dev/null
       HEALTH: false
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.browserless.rule=Host(`browserless.${DOMAIN}`)
-      - traefik.http.services.browserless.loadbalancer.server.port=3000
+      traefik.enable: "true"
+      traefik.http.routers.browserless.rule: Host(`browserless.${DOMAIN}`)
+      traefik.http.services.browserless.loadbalancer.server.port: "3000"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:3000/active?token=${BROWSERLESS_CHROMIUM_TOKEN}"]
@@ -448,9 +475,9 @@ services:
       browserless:
         condition: service_healthy
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.changedetection.rule=Host(`changedetection.${DOMAIN}`)
-      - traefik.http.services.changedetection.loadbalancer.server.port=5000
+      traefik.enable: "true"
+      traefik.http.routers.changedetection.rule: Host(`changedetection.${DOMAIN}`)
+      traefik.http.services.changedetection.loadbalancer.server.port: "5000"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "python3", "-c", "import socket; s=socket.create_connection(('localhost',5000),2); s.close()"]
@@ -481,9 +508,9 @@ services:
     volumes:
       - ./n8n:/home/node/.n8n
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.n8n.rule=Host(`n8n.${DOMAIN}`)
-      - traefik.http.services.n8n.loadbalancer.server.port=5678
+      traefik.enable: "true"
+      traefik.http.routers.n8n.rule: Host(`n8n.${DOMAIN}`)
+      traefik.http.services.n8n.loadbalancer.server.port: "5678"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:5678/healthz"]
@@ -531,9 +558,9 @@ services:
       - /data:/data:z
       - .:/homelab:z
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.filebrowser.rule=Host(`filebrowser.${DOMAIN}`)
-      - traefik.http.services.filebrowser.loadbalancer.server.port=80
+      traefik.enable: "true"
+      traefik.http.routers.filebrowser.rule: Host(`filebrowser.${DOMAIN}`)
+      traefik.http.services.filebrowser.loadbalancer.server.port: "80"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/health"]
@@ -554,9 +581,9 @@ services:
     ports:
       - 8200:8200
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.duplicati.rule=Host(`duplicati.${DOMAIN}`)
-      - traefik.http.services.duplicati.loadbalancer.server.port=8200
+      traefik.enable: "true"
+      traefik.http.routers.duplicati.rule: Host(`duplicati.${DOMAIN}`)
+      traefik.http.services.duplicati.loadbalancer.server.port: "8200"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:8200"]
@@ -603,9 +630,9 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.dozzle.rule=Host(`dozzle.${DOMAIN}`)
-      - traefik.http.services.dozzle.loadbalancer.server.port=8080
+      traefik.enable: "true"
+      traefik.http.routers.dozzle.rule: Host(`dozzle.${DOMAIN}`)
+      traefik.http.services.dozzle.loadbalancer.server.port: "8080"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "/dozzle", "healthcheck"]
@@ -624,9 +651,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ..:/opt/stacks
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.dockge.rule=Host(`dockge.${DOMAIN}`)
-      - traefik.http.services.dockge.loadbalancer.server.port=5001
+      traefik.enable: "true"
+      traefik.http.routers.dockge.rule: Host(`dockge.${DOMAIN}`)
+      traefik.http.services.dockge.loadbalancer.server.port: "5001"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "node", "-e", "const http=require('http');const r=http.get('http://localhost:5001',res=>{process.exit(res.statusCode===200?0:1)});r.on('error',()=>process.exit(1))"]
@@ -662,9 +689,9 @@ services:
       HOMEPAGE_VAR_CHANGEDETECTION_API_KEY: ${CHANGEDETECTION_API_KEY}
       HOMEPAGE_VAR_WATCHTOWER_API_TOKEN: ${WATCHTOWER_API_TOKEN}
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.homepage.rule=Host(`${DOMAIN}`)
-      - traefik.http.services.homepage.loadbalancer.server.port=3000
+      traefik.enable: "true"
+      traefik.http.routers.homepage.rule: Host(`${DOMAIN}`)
+      traefik.http.services.homepage.loadbalancer.server.port: "3000"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]

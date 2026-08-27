@@ -1,0 +1,68 @@
+---
+# Authelia configuration
+# Docs: https://www.authelia.com/configuration/
+
+theme: dark
+
+server:
+  address: tcp://0.0.0.0:9091
+
+log:
+  level: info
+
+totp:
+  issuer: authelia.com
+  period: 30
+  skew: 1
+
+authentication_backend:
+  file:
+    path: /config/users_database.yml
+    password:
+      algorithm: argon2id
+      iterations: 3
+      memory: 65536
+      parallelism: 4
+      key_length: 32
+      salt_length: 16
+
+access_control:
+  default_policy: deny
+  rules:
+    # Bypass auth for apps with their own auth
+    - domain: 'auth.{{ env "DOMAIN" }}'
+      policy: bypass
+    - domain: 'jellyfin.{{ env "DOMAIN" }}'
+      policy: bypass
+    - domain: 'n8n.{{ env "DOMAIN" }}'
+      policy: bypass
+    # Any authenticated user
+    - domain: 'seerr.{{ env "DOMAIN" }}'
+      policy: one_factor
+    - domain: '{{ env "DOMAIN" }}'
+      policy: one_factor
+    # Admin group only
+    - domain: '*.{{ env "DOMAIN" }}'
+      policy: one_factor
+      subject:
+        - 'group:admin'
+
+session:
+  name: authelia_session
+  secret: '{{ env "AUTHELIA_SESSION_SECRET" }}'
+  cookies:
+    - domain: '{{ env "DOMAIN" }}'
+      authelia_url: 'https://auth.{{ env "DOMAIN" }}'
+
+storage:
+  encryption_key: '{{ env "AUTHELIA_STORAGE_ENCRYPTION_KEY" }}'
+  local:
+    path: /config/db.sqlite3
+
+notifier:
+  filesystem:
+    filename: /config/notification.txt
+
+identity_validation:
+  reset_password:
+    jwt_secret: '{{ env "AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET" }}'

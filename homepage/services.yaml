@@ -19,6 +19,13 @@
           url: http://pihole
           key: "{{HOMEPAGE_VAR_PIHOLE_PASSWORD}}"
           version: 6
+    - Authelia:
+        icon: authelia.png
+        href: https://auth.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Authentication portal
+        server: docker
+        container: authelia
+        ping: http://authelia:9091
     - WireGuard:
         icon: wireguard.png
         href: https://wireguard.{{HOMEPAGE_VAR_DOMAIN}}

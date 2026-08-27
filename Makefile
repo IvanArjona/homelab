@@ -38,6 +38,9 @@ clean: ## Remove stopped containers, dangling images, and unused volumes
 	docker system prune -f
 	docker volume prune -f
 
+add-user: ## Add an Authelia user (pass user= email= pass= groups=admin)
+	./scripts/authelia-add-user.sh "$(user)" "$(email)" "$(pass)" "$(or $(groups),admin)"
+
 setup: ## Run initial server setup
 	chmod +x scripts/setup.sh
 	./scripts/setup.sh
