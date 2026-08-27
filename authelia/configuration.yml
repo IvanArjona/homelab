@@ -32,14 +32,11 @@ access_control:
     # Bypass auth for apps with their own auth
     - domain: 'auth.{{ env "DOMAIN" }}'
       policy: bypass
+    - domain: '{{ env "DOMAIN" }}'
+      policy: one_factor
     - domain: 'jellyfin.{{ env "DOMAIN" }}'
       policy: bypass
-    - domain: 'n8n.{{ env "DOMAIN" }}'
-      policy: bypass
-    # Any authenticated user
     - domain: 'seerr.{{ env "DOMAIN" }}'
-      policy: one_factor
-    - domain: '{{ env "DOMAIN" }}'
       policy: one_factor
     # Admin group only
     - domain: '*.{{ env "DOMAIN" }}'
