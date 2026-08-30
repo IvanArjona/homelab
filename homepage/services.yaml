@@ -118,17 +118,19 @@
           type: bazarr
           url: http://bazarr:6767
           key: "{{HOMEPAGE_VAR_BAZARR_API_KEY}}"
-    - Recyclarr:
-        icon: recyclarr.png
-        description: Sonarr and Radarr custom formats manager
+    - Profilarr:
+        icon: profilarr.png
+        href: https://profilarr.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Configuration management for Radarr/Sonarr
         weight: 4
         server: docker
-        container: recyclarr
+        container: profilarr
+        ping: http://profilarr:6868
     - Cleanuparr:
         icon: cleanuperr.png
         href: https://cleanuparr.{{HOMEPAGE_VAR_DOMAIN}}
         description: Media cleanup tool
-        weight: 4
+        weight: 5
         server: docker
         container: cleanuparr
         ping: http://cleanuparr:11011

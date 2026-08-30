@@ -342,29 +342,44 @@ services:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:6767/ping"]
 
-  recyclarr:
+  profilarr:
     <<: *base
-    container_name: recyclarr
-    image: ghcr.io/recyclarr/recyclarr:8
+    container_name: profilarr
+    image: ghcr.io/dictionarry-hub/profilarr:latest
     profiles: [media]
     depends_on:
+      profilarr-parser:
+        condition: service_healthy
       sonarr:
         condition: service_healthy
       radarr:
         condition: service_healthy
     environment:
       <<: *env
-      SONARR_API_KEY: ${SONARR_API_KEY}
-      RADARR_API_KEY: ${RADARR_API_KEY}
-    read_only: true
-    tmpfs: /tmp
-    security_opt: [no-new-privileges:true]
+      ORIGIN: https://profilarr.${DOMAIN}
+      PARSER_HOST: profilarr-parser
+      PARSER_PORT: 5000
+      PROFILARR_API_KEY: ${PROFILARR_API_KEY}
     volumes:
-      - ./recyclarr:/config
+      - ./profilarr:/config
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.profilarr.rule: Host(`profilarr.${DOMAIN}`)
+      traefik.http.services.profilarr.loadbalancer.server.port: "6868"
     healthcheck:
       <<: *healthcheck
-      test: ["CMD-SHELL", "recyclarr --version"]
-      interval: 60s
+      test: ["CMD-SHELL", "deno eval \"const c = Deno.connect({port:6868}); (await c).close()\""]
+
+  profilarr-parser:
+    <<: *base
+    container_name: profilarr-parser
+    image: ghcr.io/dictionarry-hub/profilarr-parser:latest
+    profiles: [media]
+    expose:
+      - "5000"
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000/health"]
 
   cleanuparr:
     <<: *base
