@@ -1,4 +1,4 @@
-.PHONY: up down restart pull recreate logs status ps clean update setup deploy sync ssh help
+.PHONY: up down restart pull recreate logs status ps health clean update setup deploy sync ssh help
 
 include .env
 
@@ -33,6 +33,9 @@ ps: ## List running containers
 
 status: ## Show container resource usage
 	docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}"
+
+health: ## Show health status for a container (pass s=<service>)
+	@docker inspect --format='{{json .State.Health}}' $(s) | jq
 
 clean: ## Remove stopped containers, dangling images, and unused volumes
 	docker system prune -f

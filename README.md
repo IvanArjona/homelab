@@ -50,6 +50,7 @@ make status        # Show CPU/memory usage per container
 make pull          # Pull latest images
 make update        # Pull latest changes (reset local modifications)
 make validate      # Validate compose file
+make health s=N    # Show health status for a container
 make clean         # Remove stopped containers and dangling images
 make add-user      # Add an Authelia user (user= email= pass= groups=)
 make recreate s=N  # Force recreate a service
