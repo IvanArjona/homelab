@@ -74,6 +74,7 @@
           type: jellyfin
           url: http://jellyfin:8096
           key: "{{HOMEPAGE_VAR_JELLYFIN_API_KEY}}"
+          version: 2
     - Sonarr:
         icon: sonarr.png
         href: https://sonarr.{{HOMEPAGE_VAR_DOMAIN}}
