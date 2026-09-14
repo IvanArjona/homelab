@@ -38,6 +38,12 @@
           version: 2
           username: "{{HOMEPAGE_VAR_WIREGUARD_USER}}"
           password: "{{HOMEPAGE_VAR_WIREGUARD_PASSWORD}}"
+    - Tailscale:
+        icon: tailscale.png
+        href: https://login.tailscale.com/admin/machines
+        description: Mesh VPN / subnet router
+        server: docker
+        container: tailscale
 
 - Network Infrastructure:
     - Docker Proxy:

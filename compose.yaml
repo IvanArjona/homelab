@@ -186,6 +186,34 @@ services:
       <<: *healthcheck
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://0.0.0.0:51821"]
 
+  tailscale:
+    <<: *base
+    image: tailscale/tailscale:latest
+    container_name: tailscale
+    user: root
+    hostname: homelab
+    environment:
+      <<: *env
+      TS_AUTHKEY: ${TAILSCALE_AUTHKEY}
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_ROUTES: ${NETWORK_SUBNET},${SERVER_LAN_SUBNET}
+      TS_EXTRA_ARGS: --advertise-exit-node --accept-dns=false
+      TS_USERSPACE: false
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv6.conf.all.forwarding=1
+    volumes:
+      - ./tailscale:/var/lib/tailscale
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "tailscale", "status"]
+      start_period: 30s
+
   # ===========================================================================
   # Network Infrastructure
   # ===========================================================================
