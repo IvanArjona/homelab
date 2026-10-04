@@ -153,6 +153,16 @@
           type: jackett
           url: http://jackett:9117
           password: "{{HOMEPAGE_VAR_JACKETT_PASSWORD}}"
+    - Prowlarr:
+        icon: prowlarr.png
+        href: https://prowlarr.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Indexer manager for Radarr/Sonarr
+        server: docker
+        container: prowlarr
+        widget:
+          type: prowlarr
+          url: http://prowlarr:9696
+          key: "{{HOMEPAGE_VAR_PROWLARR_API_KEY}}"
     - qBittorrent:
         icon: qbittorrent.png
         href: https://qbittorrent.{{HOMEPAGE_VAR_DOMAIN}}

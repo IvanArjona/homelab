@@ -450,6 +450,21 @@ services:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:9117/UI/Dashboard"]
 
+  prowlarr:
+    <<: *base
+    container_name: prowlarr
+    image: ghcr.io/linuxserver/prowlarr:latest
+    profiles: [downloads]
+    volumes:
+      - ./prowlarr:/config
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.prowlarr.rule: Host(`prowlarr.${DOMAIN}`)
+      traefik.http.services.prowlarr.loadbalancer.server.port: "9696"
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:9696/ping"]
+
   qbittorrent:
     <<: *base
     container_name: qbittorrent
@@ -727,6 +742,7 @@ services:
       HOMEPAGE_VAR_SEERR_API_KEY: ${SEERR_API_KEY}
       HOMEPAGE_VAR_BAZARR_API_KEY: ${BAZARR_API_KEY}
       HOMEPAGE_VAR_JACKETT_PASSWORD: ${JACKETT_PASSWORD}
+      HOMEPAGE_VAR_PROWLARR_API_KEY: ${PROWLARR_API_KEY}
       HOMEPAGE_VAR_QBITTORRENT_USERNAME: ${QBITTORRENT_USERNAME}
       HOMEPAGE_VAR_QBITTORRENT_PASSWORD: ${QBITTORRENT_PASSWORD}
       HOMEPAGE_VAR_CHANGEDETECTION_API_KEY: ${CHANGEDETECTION_API_KEY}
