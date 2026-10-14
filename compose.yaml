@@ -430,6 +430,27 @@ services:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:11011"]
 
+  dispatcharr:
+    <<: *base
+    container_name: dispatcharr
+    image: ghcr.io/dispatcharr/dispatcharr:latest
+    profiles: [media]
+    user: root
+    environment:
+      <<: *env
+      DISPATCHARR_ENV: aio
+      DISPATCHARR_LOG_LEVEL: info
+    volumes:
+      - ./dispatcharr:/data
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.dispatcharr.rule: Host(`dispatcharr.${DOMAIN}`)
+      traefik.http.services.dispatcharr.loadbalancer.server.port: "9191"
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "curl", "-f", "http://localhost:9191"]
+      start_period: 60s
+
   # ===========================================================================
   # Downloads
   # ===========================================================================

@@ -141,6 +141,14 @@
         server: docker
         container: cleanuparr
         ping: http://cleanuparr:11011
+    - Dispatcharr:
+        icon: dispatcharr.png
+        href: https://dispatcharr.{{HOMEPAGE_VAR_DOMAIN}}
+        description: IPTV & stream management
+        weight: 6
+        server: docker
+        container: dispatcharr
+        ping: http://dispatcharr:9191
 
 - Downloads:
     - Jackett:
